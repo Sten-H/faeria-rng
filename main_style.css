@@ -1,0 +1,58 @@
+html, body {
+    height: 100%;
+    color: white;
+    height: 100%;
+    background: #023E4F;
+    background: -webkit-linear-gradient(#021D24, #023E4F);
+    /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(#021D24, #023E4F);
+    /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(#021D24, #023E4F);
+    /* For Firefox 3.6 to 15 */
+    background: linear-gradient(#021D24, #023E4F);
+    /* Standard syntax */
+}
+
+.text-highlight {
+    color: #BCA665;
+}
+
+label {
+    color: #BCA665;
+}
+
+header {
+    text-align: center;
+}
+.footer {
+  text-align: center;
+  /*position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 60px;*/
+}
+/* CSS for spinning glyphicons */
+.glyphicon-spin {
+    -webkit-animation: spin 1000ms infinite linear;
+    animation: spin 1000ms infinite linear;
+}
+@-webkit-keyframes spin {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(359deg);
+        transform: rotate(359deg);
+    }
+}
+@keyframes spin {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(359deg);
+        transform: rotate(359deg);
+    }
+}
