@@ -3,16 +3,6 @@ var chance = {}; // chance namespace handles probability calculation
 var main = {}; // main namespace handles presentation
 (function(context) {
     "use strict";
-
-    this.factorial = function(num) {
-        if (num < 0)
-            return -1;
-        else if (num === 0)
-            return 1;
-        else {
-            return (num * factorial(num - 1));
-        }
-    };
     /**
      * Recursive implementation of n choose k. Both n and k have to be
      * positive integers, otherwise -1 is returned.
@@ -32,7 +22,7 @@ var main = {}; // main namespace handles presentation
     }
     /**
      * Calculates the chance to draw atleast 1 of the target cards.
-     * @param  {Integer} targetCardAmount How many of the target card the deck contains
+     * @param  {Array} cardInfo Array containing maps of {amount: x, needed: y} maps
      * @param  {Integer} drawAmount       How many cards to draw
      * @param  {Integer} [deckSize=30]    Deck size, default is 30
      * @return {Number}                  Chance in percent

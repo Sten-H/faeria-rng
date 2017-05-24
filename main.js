@@ -45,26 +45,29 @@ var main = {};
         });
         return totalTargetCards <= DECK_SIZE;
     }
+    // this.calculate = function() {
+    //     var drawAmount = Number($("#drawAmount").val());
+    //     var str;
+    //     if (isInputValid()) {
+    //         var cardInfo = [];
+    //         $.each(cardInputs, function(index, input) {
+    //             var targetAmount = Number(input.amount.val());
+    //             var targetNeeded = Number(input.needed.val());
+    //             cardInfo.push({
+    //                 needed: targetNeeded,
+    //                 amount: targetAmount
+    //             });
+    //         });
+    //         var c = chance.chanceToDraw(cardInfo, drawAmount, DECK_SIZE);
+    //
+    //         str = "Out of <span class='text-highlight'>1000</span> hands <span class='text-highlight'>" + (c * 1000).toFixed(2) + "</span> of them would be desired";
+    //     } else {
+    //         str = "Target cards are larger than deck size.";
+    //     }
+    //     $("#chance-text").html(str);
+    // };
     this.calculate = function() {
-        var drawAmount = Number($("#drawAmount").val());
-        var str;
-        if (isInputValid()) {
-            var cardInfo = [];
-            $.each(cardInputs, function(index, input) {
-                var targetAmount = Number(input.amount.val());
-                var targetNeeded = Number(input.needed.val());
-                cardInfo.push({
-                    needed: targetNeeded,
-                    amount: targetAmount
-                });
-            });
-            var c = chance.chanceToDraw(cardInfo, drawAmount, DECK_SIZE);
 
-            str = "Out of <span class='text-highlight'>1000</span> hands <span class='text-highlight'>" + (c * 1000).toFixed(2) + "</span> of them would be desired";
-        } else {
-            str = "Target cards are larger than deck size.";
-        }
-        $("#chance-text").html(str);
     };
     $(document).ready(function() {
         // Add initial target card input
@@ -88,5 +91,17 @@ var main = {};
             // would like to append loading icon, but it doesn't update until calc is done
             // $(this).append();
         });
+        console.log(calculateProb({
+            drawn: 20,
+            needed: [{
+                    draw: 1,
+                    deck: 3
+                },
+                {
+                    draw: 1,
+                    deck: 3
+                }
+            ]
+        }));
     });
 }).apply(main);
