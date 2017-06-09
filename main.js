@@ -50,15 +50,28 @@ var main = {};
         var str;
         if (isInputValid()) {
             var cardInfo = [];
+            var needed = [];  // For pauanyu solution
             $.each(cardInputs, function(index, input) {
                 var targetAmount = Number(input.amount.val());
                 var targetNeeded = Number(input.needed.val());
                 cardInfo.push({
                     needed: targetNeeded,
-                    amount: targetAmount
+                    amount: targetAmount,
+                    value: index
+                });
+                needed.push({
+                    deck: targetAmount,
+                    draw: targetNeeded
                 });
             });
-            var c = chance.chanceToDraw(cardInfo, drawAmount);
+            // var c = chance.chanceToDraw(cardInfo, drawAmount);
+            var c = 0
+            var t0 = performance.now();
+            console.log(monteCarlo.simulate(cardInfo, drawAmount));
+            console.log("monteCarlo time taken: " + ((performance.now() - t0) / 1000) + " seconds.");
+            t0 = performance.now();
+            console.log(calculateProb({drawn: drawAmount, needed}));
+            console.log("pauanyu time taken: " + ((performance.now() - t0) / 1000) + " seconds.");
 
             str = "Out of <span class='text-highlight'>1000</span> hands <span class='text-highlight'>" + (c * 1000).toFixed(2) + "</span> of them would be desired";
         } else {
@@ -88,25 +101,5 @@ var main = {};
             evt.preventDefault();
             main.calculate();
         });
-        console.log(calculateProb({
-            drawn: 20,
-            needed: [{
-                    draw: 2,
-                    deck: 3
-                },
-                {
-                    draw: 2,
-                    deck: 3
-                },
-            ]
-        }));
-        /*
-        20 draws:
-        3 deck, 1 needed ~ 97%
-        3 deck, 2 needed ~ 74%
-        3 deck, 3 needed ~ 28%
-        (3 deck, 3 needed) & (3 deck, 3 needed) ~ 6.5%
-        (3 deck, 2 needed) & (3 deck, 2 needed) ~ 54.5%
-        */
     });
 }).apply(main);
