@@ -25,14 +25,15 @@ var monteCarlo = {};
     }
     /**
      * Returns deck with sought after cards in it. Each card value is entered in
-     * to deck array as many times as there should be instances of it.
+     * to deck array as many times as there should be instances of it, all
+     * card of no interest are assigned value -1
      * @param  {Array} deck     Deck represented as integer array
      * @param  {Array} targetCards Array containing Card objects
      * @return {Array}          Returns array representing the populated deck.
      */
-    function populateDeck(deck, targetCards) {
+    function createDeck(targetCards) {
+        var d = Array(30).fill(-1);
         currIndex = 0;
-        var d = deck.slice(0);
         targetCards.forEach((card, index) => {
             d.fill(card.value, currIndex, currIndex + card.amount);
             currIndex += card.amount;
@@ -42,7 +43,7 @@ var monteCarlo = {};
     /**
      * Checks if deck contains card in the needed amount.
      * @param  {Array} deck  Deck represented as integer array
-     * @param  {Object} card Sought after card
+     * @param  {Object} card Sought after card object
      * @return {boolean}      True if deck contains card.value atleast card.needed times
      */
     function contains(deck, card) {
@@ -94,9 +95,7 @@ var monteCarlo = {};
         return success / totalTries;
     }
     this.run = function(targetCards, drawAmount, deckSize = DECK_SIZE) {
-        // Create and populate deck
-        var deck = Array(30).fill(-1);
-        deck = populateDeck(deck, targetCards);
+        var deck = createDeck(targetCards);
         return simulate(deck, targetCards, drawAmount);
     };
     this.getDeckSize = function() {

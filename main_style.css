@@ -1,7 +1,5 @@
 html, body {
-    height: 100%;
     color: white;
-    height: 100%;
     background: #023E4F;
     background: -webkit-linear-gradient(#021D24, #023E4F);
     /* For Safari 5.1 to 6.0 */
@@ -12,7 +10,14 @@ html, body {
     background: linear-gradient(#021D24, #023E4F);
     /* Standard syntax */
 }
+html {
+    position: relative;
+    min-height: 100%;
+}
 
+body {
+    margin-bottom: 40px;
+}
 .text-highlight {
     color: #BCA665;
 }
@@ -20,16 +25,20 @@ html, body {
 label {
     color: #BCA665;
 }
-
+/*.jumbotron {
+  background-image: url("images/jumbo.png");
+  background-size: cover;
+  max-height: 200px;
+}*/
 header {
     text-align: center;
 }
 .footer {
   text-align: center;
-  /*position: absolute;
+  position: absolute;
   bottom: 0;
   width: 100%;
-  height: 60px;*/
+  height: 40px;
 }
 .mulligan-form {
   display: none;

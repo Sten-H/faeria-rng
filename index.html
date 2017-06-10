@@ -11,51 +11,67 @@
 </head>
 
 <body>
-    <div class="container content">
+    <div class="container content rumble">
         <div class="row">
             <div class="offset-sm-2 col-sm-8 mt-3">
                 <header>
-                    <h1 class="display-2">Rage Assistant</h1>
+                    <h1 class="display-2 rumble" id="title">Rage Assistant</h1>
                     <p class="lead text-highlight">Start complaining more accurately</p>
                 </header>
                 <!-- I call javascript code from here to use form input checks
                      to stop function call if input is invalid -->
                 <form id="chance-form" action="javascript:main.calculate()">
                     <div id="target-cards">
+                        <!--  Labels for columns -->
+                        <div class="row mb-2">
+                            <div class="col-5">
+                                <span class="text-highlight"> # of cards in deck </span>
+                            </div>
+                            <div class="col-5">
+                                <span class="text-highlight"> # of cards needed </span>
+                            </div>
+                        </div>
                         <!-- This is filled with target card input fields -->
                     </div>
                     <div class="btn-group mb-2">
-                        <button id="add-card-btn" class="btn btn-info">Add card</button>
-                        <button id="remove-card-btn" class="btn btn-danger">Remove card</button>
+                        <button id="add-card-btn" class="btn btn-info">
+                            Add card <span class="glyphicon glyphicon-plus"></span>
+                        </button>
                     </div>
                     <div class="form-group">
                         <label for="draw-amount">How many draws</label>
-                        <input id="draw-amount" class="form-control" type="number" min=1 max=30 value=10 required>
+                        <input id="draw-amount" class="form-control" type="number" min=1 max=30 value=20 placeholder="Total # of draws"required>
                     </div>
-                    <!-- <div class="form-check">
-                        <label class="form-check-label">
-                            <input class="form-check-input" id="mulligan-checkbox" type="checkbox" value="">
-                            Include mulligan
-                        </label>
-                    </div> -->
+                    <!--  Mulligan checkbox -->
+                    <label class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="mulligan-checkbox">
+                        <span class="custom-control-indicator"></span>
+                        <span class="custom-control-description">Include mulligan (not implemented)</span>
+                    </label>
                     <div class="form-group mulligan-form">
-                        <label for="mulligan-amount">How many cards mulliganed</label>
-                        <input id="mulligan-amount" class="form-control" type="number" min=0 max=3 value=3 required>
+                        <label for="mulligan-amount"># of cards mulliganed</label>
+                        <input id="mulligan-amount" class="form-control" type="number" min=0 max=3 value=3 required placeholder="Mulligan amount">
                     </div>
-                    <button id="calculate-btn" class="btn btn-primary">
+                    <button id="calculate-btn" class="btn btn-primary btn-block">
                         Calculate chance <span class="glyphicon glyphicon-spin"></span>
                     </button>
-                    <form>
+                <form>
             </div>
         </div>
+        <!--  Row presenting the probability results -->
         <div class="row">
             <div class="offset-sm-2 col-sm-8">
                 <h2 id="chance-text">
-                    Out of <span class='text-highlight'>1000</span> hands <span class='text-highlight' id='chance-text-number'> --- </span> of them would be desired</h2>
+                    Out of <span class='text-highlight'>1000</span> hands <span class='text-highlight rumble' id='chance-text-number'> --- </span> of them would be desired
+                </h2>
             </div>
         </div>
     </div>
+    <footer class="footer lead">
+        <img src="images/vohiyo.png" width=32 alt="Vohiyo maymay">Credit to <span class="text-highlight">pauanyu</span> for inspiration and help.<img src="images/vohiyo.png" width=32 alt="Vohiyo maymay">
+    </footer>
     <script src="lib/jquery-3.1.1.js"></script>
+    <script src="lib/jrumble-1.3/jquery.jrumble.1.3.js"></script>
     <script src="lib/tether-1.3.3/js/tether.js"></script>
     <script src="lib/bootstrap-4.0.0-alpha.6-dist/js/bootstrap.js"></script>
     <script src="lib/bootstrap-slider/bootstrap-slider.js"></script>
