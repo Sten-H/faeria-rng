@@ -31,6 +31,9 @@ header {
   width: 100%;
   height: 60px;*/
 }
+.mulligan-form {
+  display: none;
+}
 /* CSS for spinning glyphicons */
 .glyphicon-spin {
     -webkit-animation: spin 1000ms infinite linear;

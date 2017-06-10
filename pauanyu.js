@@ -27,7 +27,7 @@ function calculateProb(x) {
   var success = 0;
   var failure = 0;
 
-  next: for (var i = 0; i < 700000; ++i) {
+  next: for (var i = 0; i < 1000000; ++i) {
     shuffle(cards);
 
     var index = 0;

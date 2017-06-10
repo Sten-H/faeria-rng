@@ -13,32 +13,45 @@
 <body>
     <div class="container content">
         <div class="row">
-            <div class="offset-sm-2 col-sm-8">
+            <div class="offset-sm-2 col-sm-8 mt-3">
                 <header>
                     <h1 class="display-2">Rage Assistant</h1>
                     <p class="lead text-highlight">Start complaining more accurately</p>
                 </header>
-                <form id="chance-form">
+                <!-- I call javascript code from here to use form input checks
+                     to stop function call if input is invalid -->
+                <form id="chance-form" action="javascript:main.calculate()">
                     <div id="target-cards">
-                        <!-- This is filled with target card amount input fields -->
+                        <!-- This is filled with target card input fields -->
                     </div>
-                    <div class="btn-group">
+                    <div class="btn-group mb-2">
                         <button id="add-card-btn" class="btn btn-info">Add card</button>
                         <button id="remove-card-btn" class="btn btn-danger">Remove card</button>
                     </div>
                     <div class="form-group">
-                        <label for="drawAmount">How many draws</label>
-                        <input id="drawAmount" class="form-control" type="number" min=0 max=30 required>
+                        <label for="draw-amount">How many draws</label>
+                        <input id="draw-amount" class="form-control" type="number" min=1 max=30 value=10 required>
+                    </div>
+                    <!-- <div class="form-check">
+                        <label class="form-check-label">
+                            <input class="form-check-input" id="mulligan-checkbox" type="checkbox" value="">
+                            Include mulligan
+                        </label>
+                    </div> -->
+                    <div class="form-group mulligan-form">
+                        <label for="mulligan-amount">How many cards mulliganed</label>
+                        <input id="mulligan-amount" class="form-control" type="number" min=0 max=3 value=3 required>
                     </div>
                     <button id="calculate-btn" class="btn btn-primary">
-                        Calculate chance
+                        Calculate chance <span class="glyphicon glyphicon-spin"></span>
                     </button>
                     <form>
             </div>
         </div>
         <div class="row">
             <div class="offset-sm-2 col-sm-8">
-                <h2 id="chance-text"></h2>
+                <h2 id="chance-text">
+                    Out of <span class='text-highlight'>1000</span> hands <span class='text-highlight' id='chance-text-number'> --- </span> of them would be desired</h2>
             </div>
         </div>
     </div>
@@ -46,7 +59,7 @@
     <script src="lib/tether-1.3.3/js/tether.js"></script>
     <script src="lib/bootstrap-4.0.0-alpha.6-dist/js/bootstrap.js"></script>
     <script src="lib/bootstrap-slider/bootstrap-slider.js"></script>
-    <script src="chance.js"></script>
+    <script src="probability.js"></script>
     <script src="pauanyu.js"></script>
     <script src="main.js"></script>
 </body>
