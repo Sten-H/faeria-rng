@@ -10,11 +10,17 @@ html, body {
     background: linear-gradient(#021D24, #023E4F);
     /* Standard syntax */
 }
+
 html {
     position: relative;
     min-height: 100%;
 }
-
+/* Shrink precision radio button texts on smaller screens*/
+@media only screen and (max-width: 400px) {
+    .precision-group label {
+        font-size: 0.6em;
+    }
+}
 body {
     margin-bottom: 40px;
 }
@@ -25,13 +31,16 @@ body {
 label {
     color: #BCA665;
 }
-/*.jumbotron {
-  background-image: url("images/jumbo.png");
-  background-size: cover;
-  max-height: 200px;
-}*/
+
 header {
     text-align: center;
+}
+
+hr {
+    border-color: rgba(188,166,101, 0.7);
+}
+#error-wrapper, #time-taken-wrapper {
+    display: none;
 }
 .footer {
   text-align: center;
@@ -40,9 +49,55 @@ header {
   width: 100%;
   height: 40px;
 }
-.mulligan-form {
-  display: none;
+
+.help-tooltip {
+  font-size: 1.2em;
+  font-weight: bold;
+    cursor: pointer;
 }
+
+.question:before {
+    content: "Q: ";
+}
+
+.question {
+    font-style: italic;
+    margin-bottom: 0;
+}
+
+.answer {
+    font-size: 0.9em;
+    margin-top: 0;
+    color: #BCA665;
+    text-indent: 2em;
+}
+
+.transparent-bg {
+  background-color: rgba(2, 45, 57, 0.2);
+}
+
+a, a:hover, a:visited {
+  color: #BCA665;
+  text-decoration: underline;
+}
+
+.card-header a {
+  display: block;
+  color: #BCA665;
+  text-decoration: none;
+}
+.card-header a:after {
+    /* symbol for "opening" panels */
+    font-family: 'Glyphicons Halflings';  /* essential for enabling glyphicon */
+    content: "\e114";    /* adjust as needed, taken from bootstrap.css */
+    float: right;        /* adjust as needed */
+}
+
+.card-header a.collapsed:after {
+    /* symbol for "collapsed" panels */
+    content: "\e080";    /* adjust as needed, taken from bootstrap.css */
+}
+
 /* CSS for spinning glyphicons */
 .glyphicon-spin {
     -webkit-animation: spin 1000ms infinite linear;
@@ -58,6 +113,7 @@ header {
         transform: rotate(359deg);
     }
 }
+
 @keyframes spin {
     0% {
         -webkit-transform: rotate(0deg);
@@ -66,5 +122,32 @@ header {
     100% {
         -webkit-transform: rotate(359deg);
         transform: rotate(359deg);
+    }
+}
+
+.glyphicon-rev-spin {
+    -webkit-animation: rev-spin 1000ms infinite linear;
+    animation: rev-spin 1000ms infinite linear;
+}
+
+@-webkit-keyframes rev-spin {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(-359deg);
+        transform: rotate(-359deg);
+    }
+}
+
+@keyframes rev-spin {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(-359deg);
+        transform: rotate(-359deg);
     }
 }
