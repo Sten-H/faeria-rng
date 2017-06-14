@@ -98,7 +98,7 @@ let main = {};
     function updateInputRow(input, index) {
         input.deleteBtn.attr("data-index", index);
         input.needed.attr("placeholder", `#${index + 1} needed`);
-        input.amount.attr("placeholder", `#${index + 1} amount`);
+        input.total.attr("placeholder", `#${index + 1} amount`);
     }
     /**
      * Deletes card input row. Listener of delete button on each row. Deletes corresponding
@@ -109,7 +109,7 @@ let main = {};
         event.preventDefault();
         if (cardInputs.length > 1) {
             let index = $(this).attr("data-index"),
-                inputRow = cardInputs[index].amount.closest(".row");
+                inputRow = cardInputs[index].total.closest(".row");
             inputRow.slideToggle("fast", () => {
                 cardInputs.splice(index, 1);
                 cardInputs.forEach((input, index) => updateInputRow(input, index));
@@ -169,18 +169,18 @@ let main = {};
      */
     function addCardInput() {
         cardInputs.push({});
-        let amountValue = monteCarlo.getRandomIntInclusive(1,3),
-            neededValue = monteCarlo.getRandomIntInclusive(1, amountValue),
-            amount = createInputField("amount", 1, amountValue),
+        let totalValue = helpers.getRandomIntInclusive(1,3),
+            neededValue = helpers.getRandomIntInclusive(1, totalValue),
+            total = createInputField("amount", 1, totalValue),
             needed = createInputField("needed", 1, neededValue),
             deleteBtn = createDeleteInputRowButton(),
             row = $("<div class='row'></div>");
         cardInputs[cardInputs.length - 1] = {
-            amount: amount.find("input"),
+            total: total.find("input"),
             needed: needed.find("input"),
             deleteBtn: deleteBtn.find("button")
         };
-        row.append(colWrap(amount, 5), colWrap(needed, 5), colWrap(deleteBtn, 2));
+        row.append(colWrap(total, 5), colWrap(needed, 5), colWrap(deleteBtn, 2));
         $("#target-cards").append(row);
         row.hide();  // Hide so it can be animated to show with slideToggle
         $(row).slideToggle("fast");
@@ -194,9 +194,9 @@ let main = {};
     function isInputValid(drawAmount) {
         let msg = $("<span>");
         let totalAmount = cardInputs.reduce((acc, input) =>
-            acc + Number(input.amount.val()), 0);
+            acc + Number(input.total.val()), 0);
         // User supposes a larger deck than is possible
-        if(totalAmount > monteCarlo.getDeckSize()) {
+        if(totalAmount > simulation.getDeckSize()) {
             msg.append("Target card ", highlightWrap("amounts"), " sum exceeds deck size");
             return {val: false, msg: msg };
         }
@@ -208,7 +208,7 @@ let main = {};
             return {val: false, msg: msg};
         }
         let validNeeded = cardInputs.every((input) =>
-            Number(input.amount.val()) >= Number(input.needed.val()));
+            Number(input.total.val()) >= Number(input.needed.val()));
         // One or more needed values exceeds its amount in deck
         if (!validNeeded) {
             msg.append(highlightWrap("Needed"), " cannot be larger than card ", highlightWrap("amount"), " in deck");
@@ -232,9 +232,9 @@ let main = {};
         return cardInputs.map((input, index) => {
             return {
                 needed: Number(input.needed.val()),
-                amount: Number(input.amount.val()),
+                total: Number(input.total.val()),
                 value: index,
-                foundAmount: 0
+                foundtotal: 0
             };
         });
     }
@@ -243,16 +243,22 @@ let main = {};
      */
     this.run = function() {
         let smartMulligan = $("#mulligan-checkbox").is(':checked'),
-            drawAmount = Number($("#draw-amount").val()),
-            precision = Number($("input:radio[name='precision']:checked").val()),
+            drawAmount = Number($("#draw-total").val()),
             validity = isInputValid(drawAmount),
             showEffects = $("#effects-checkbox").is(':checked');
         if (validity.val) {
             let cardInfo = getUserCardInput(),
-                [timeTaken, c] = timeFunction(monteCarlo.run, cardInfo, drawAmount, precision, smartMulligan);
+                timeTaken,
+                c;
+            if(smartMulligan) {
+                [timeTaken, c] = timeFunction(simulation.run, cardInfo, drawAmount);
+            }
+            else {
+                [timeTaken, c] = timeFunction(chance.calculate, cardInfo, drawAmount);
+            }
             timeTaken = (timeTaken / 1000).toFixed(3); // convert to seconds
-            // Convert to successful hands out of a thousand, show decimals if high precision was used.
-            c = (precision > 500000) ? (c * 1000).toFixed(2) : (c * 1000).toFixed();
+            // Convert to successful hands out of a thousand
+            c = (c * 1000).toFixed();
             // Clean up load time effects
             cleanupWaitEffects();
             // Update text telling user the results
@@ -291,24 +297,39 @@ let main = {};
         });
         /* This is used because on mouseDown triggers before the form submission, so it will
            update the DOM before time consuming simulation is called by form submission */
-        $("#calculate-btn").on("mousedown", function() {
-            // If user input is valid add loading effects
+        $("#calculate-btn").on("mousedown", () => {
+            // Add spinning load icon to button if form input is valid
             if ($('#chance-form')[0].checkValidity()) {
                 $("#calculate-btn").addClass("disabled");
                 $("#chance-text-number").html("---");
                 $("#calculate-btn span").addClass(loadIcon);
             }
         });
-        $("#time-checkbox").on("change", function() {
-           $("#time-taken-wrapper").slideToggle();
+        // Show time taken checkbox callback
+        $("#time-checkbox").on("change", () => $("#time-taken-wrapper").slideToggle());
+        // Use mulligan checkbox callback
+        $("#mulligan-checkbox").on("change", (evt) => {
+            let timeCheck = $("#time-checkbox");
+            let target = $(evt.target);
+            // Mulligans have been enabled, display show time checkbox and check it by default
+            if(target.is(":checked")) {
+                timeCheck.prop("checked", true);
+                timeCheck.triggerHandler("change");
+            }
+            // Mulligans disabled, uncheck show time checkbox and trigger its change callback
+            else if (!target.is(":checked") && timeCheck.is(":checked")) {
+                timeCheck.prop("checked", false);
+                timeCheck.triggerHandler("change");
+            }
+            // Hide show time checkbox
+            $("#time-taken-form-group").slideToggle();
         });
         // Initialize rumble effect on elements
         $(".rumble").jrumble();
         // This sets the options collapse arrow the right way at start
-        $(".card-header a").toggleClass('collapsed');
+        $(".card-header a").toggleClass("collapsed");
         // Initialize tooltips
         $('[data-toggle="tooltip"]').tooltip();
-        // Set a random draw amount starting value
-        $("#draw-amount").val(monteCarlo.getRandomIntInclusive(3, 20));
+        $("#draw-total").val(helpers.getRandomIntInclusive(3, 20));
     });
 }).apply(main);

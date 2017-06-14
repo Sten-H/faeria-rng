@@ -1,8 +1,12 @@
-/*jshint esversion: 6 */
-let monteCarlo = {};
-(function() {
+let helpers = {};
+(function(context) {
     "use strict";
-    const DECK_SIZE = 30;
+    this.range = function(start, end) {
+        return [...new Array(end - start).keys()].map((val) => val + start);
+    };
+    this.rangeInclusive = function(start, end) {
+        return this.range(start, end + 1);
+    };
     this.getRandomInt = function(min, max) {
         min = Math.ceil(min);
         max = Math.floor(max);
@@ -13,6 +17,107 @@ let monteCarlo = {};
         max = Math.floor(max);
         return Math.floor(Math.random() * (max - min + 1)) + min;
     };
+}).apply(helpers);
+
+/**
+ * Chance namespace calculates probability mathematically using combinatorics
+ */
+let chance = {};
+(function(context) {
+    "use strict";
+    const DECK_SIZE = 30;
+    /**
+     * Recursive implementation of n choose k. Both n and k have to be
+     * positive integers, otherwise -1 is returned.
+     * @param  {Integer} n Total amount to choose from
+     * @param  {Integer} k How many to choose
+     * @return {Integer}   Returns how many possible combinations can be drawn disregarding order drawn
+     */
+    function choose (n, k) {
+        if (n < 0 || k < 0) {
+            return -1;
+        }
+        if (k === 0) {
+            return 1;
+        } else {
+            return (n * choose(n - 1, k - 1)) / k;
+        }
+    }
+
+    /**
+     * Returns the number of combinations the cards can make. FIXME explain better.
+     * @param combinations
+     * @returns {*}
+     */
+    function combinationCount (combinations) {
+        return combinations.reduce((sum, combo) => {
+            const comboProduct = combo.reduce((product, card) => {
+                    return product * choose(...card);
+                }, 1);
+            return comboProduct + sum;
+        }, 0);
+    }
+
+    /**
+     * Fills a combinations of target cards with remaining draws from non target cards and returns that updated
+     * array of combinations.
+     * @param targetCombinations
+     * @param draws
+     * @returns {*|Array}
+     */
+    function fillCombinations(targetCombinations, draws) {
+        const nonTargetAmount = DECK_SIZE - targetCombinations[0].reduce((acc, card) => {
+                return acc + card[0];
+            }, 0);
+        // Add the remaining draws (after combination has been drawn) from non target cards
+        return targetCombinations.map((combo) => {
+            const drawn = combo.reduce((drawAcc, card) => drawAcc + card[1], 0),
+                drawsLeft = Math.max(draws - drawn, 0);
+            return [...combo, [nonTargetAmount, drawsLeft]];
+        });
+    }1
+    /**
+     * Creates all valid combination of target card draws. Draws only from target cards, the deck is not considered.
+     * Every valid card draw is represented as an array with two values [total, drawn], for a targetCard {needed: 2, amount: 3}
+     * two array will be created since there are tvo valid combinations of that card (drawn = 2 and drawn = 3),
+     * each separate combination of a card will then be combined with all other cards valid combinations to create
+     * all valid combinations of target card draws.
+     * FIXME The rampant ... spread is to continually flatten results, otherwise results are nested very deeply, fix somehow
+     * @param targetCards
+     * @param activeCombo
+     * @returns {*}
+     */
+        function targetCombinations (targetCards, activeCombo=[]) {
+            if (targetCards.length === 0) {
+                return [activeCombo];  // Not entirely sure why I need to wrap this
+            }
+            const [card, ...cardsLeft] = targetCards;
+            return [...helpers.rangeInclusive(card.needed, card.total).reduce( (results, currentNeeded) => {
+                return [...results, ...targetCombinations(cardsLeft, [...activeCombo, [card.total, currentNeeded]])];
+            }, [])];
+        }
+    /**
+     *
+     * @param cards {Array}     Array containing Objects with information about target cards (amount, needed)
+     * @param draws {Number}    Amount of draws
+     * @returns {number}        Chance to draw desired hand
+     */
+    this.calculate = function(cards, draws) {
+        const validTargetCombinations = targetCombinations(cards),
+            allValidCombinations = fillCombinations(validTargetCombinations, draws);
+        return combinationCount(allValidCombinations) / choose(DECK_SIZE, draws);
+    };
+}).apply(chance);
+
+/**
+ * simulation namespace calculates probability by simulating many hands drawn and looking at the number of desired hands
+ * found in relation to all hands drawn. It also simulates intelligent mulligans which is its only advantage over
+ * chance namespace solution.
+ */
+let simulation = {};
+(function() {
+    "use strict";
+    const DECK_SIZE = 30;
     /**
      * In place swaps values of i and j indexes in array.
      * @param  {Array} a [description]
@@ -46,8 +151,8 @@ let monteCarlo = {};
         let deck = new Array(30).fill(-1),
             currIndex = 0;
         targetCards.forEach((card) => {
-            deck.fill(card.value, currIndex, currIndex + card.amount);
-            currIndex += card.amount;
+            deck.fill(card.value, currIndex, currIndex + card.total);
+            currIndex += card.total;
         });
         return deck;
     }
@@ -110,20 +215,19 @@ let monteCarlo = {};
      * @param  {Boolean} smartMulligan  use smart mulligans in simulation if true
      * @return {Array}                An array where the first object is active hand and second is active deck
      */
-    function mulligan(deck, targetCards, smartMulligan) {
+    function mulligan(deck, targetCards) {
         let activeHand = deck.slice(0, 3),
             activeDeck = deck.slice(3);
         // Mulligan all non target cards.
         activeHand = activeHand.filter((val) => val >= 0);
         // Mulligan excessive target cards.
-        if(smartMulligan)
-            activeHand = mulliganExcessiveCards(activeHand, targetCards);
+        activeHand = mulliganExcessiveCards(activeHand, targetCards);
         let mulliganCount = 3 - activeHand.length;
         /* Put mulliganed cards back in deck. All mulliganed cards are of no interest (-1) even if they are target cards (excessive)
          If speed is highly valued, instead of shuffling, the cards can be put back at random indexes instead of shuffling */
         for(let i = 0; i < mulliganCount; i++) {
             activeDeck.push(-1);
-            swap(activeDeck, activeDeck.length -1, monteCarlo.getRandomIntInclusive(0, activeDeck.length));
+            swap(activeDeck, activeDeck.length -1, helpers.getRandomIntInclusive(0, activeDeck.length));
         }
         // Draw up to three cards again
         activeHand = activeHand.concat(activeDeck.slice(0, mulliganCount));
@@ -140,11 +244,11 @@ let monteCarlo = {};
      * @param  {Boolean} smartMulligan  use smart mulligans in simulation if true
      * @return {boolean}          Returns true if drawn cards contain required cards.
      */
-    function trial(deck, targetCards, drawAmount, smartMulligan) {
+    function trial(deck, targetCards, drawAmount) {
         let activeDeck = shuffle(deck),
             activeHand = [],
             drawsLeft = drawAmount;
-        [activeHand, activeDeck] = mulligan(activeDeck, targetCards, smartMulligan);
+        [activeHand, activeDeck] = mulligan(activeDeck, targetCards);
         drawsLeft -= 3;  // Account for starting hand drawn.
         activeHand = activeHand.concat(activeDeck.slice(0, drawsLeft));
         // Return true if every needed card is contained in drawn cards
@@ -160,11 +264,11 @@ let monteCarlo = {};
      * @param  {Boolean} smartMulligan  use smart mulligans in simulation if true
      * @return {Number}            ratio of successful draws to total draws
      */
-    function simulate(deck, targetCards, drawAmount, precision, smartMulligan) {
+    function simulate(deck, targetCards, drawAmount, precision=200000) {
         let totalTries = precision,
             success = 0;
         for (let i = 0; i < totalTries; i++) {
-            if(trial(deck, targetCards, drawAmount, smartMulligan))
+            if(trial(deck, targetCards, drawAmount))
                 success++;
         }
         return success / totalTries;
@@ -177,11 +281,11 @@ let monteCarlo = {};
      * @param  {Boolean} [smartMulligan=false]  If true will use more time consuming intelligent mulligan
      * @return {Number}                      Returns the ratio of desired hands to all hands
      */
-    this.run = function(targetCards, drawAmount, precision, smartMulligan=false) {
+    this.run = function(targetCards, drawAmount) {
         let deck = createDeck(targetCards);
-        return simulate(deck, targetCards, drawAmount, precision, smartMulligan);
+        return simulate(deck, targetCards, drawAmount);
     };
     this.getDeckSize = function() {
         return DECK_SIZE;
     };
-}).apply(monteCarlo);
+}).apply(simulation);

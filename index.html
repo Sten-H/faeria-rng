@@ -40,8 +40,8 @@
                         <div class="form-group">
                             <span class="float-right text-highlight text-bold help-tooltip" data-toggle="tooltip" data-placement="left"
                                   title="All non-target cards in starting hand will be mulliganed.">?</span>
-                            <label for="draw-amount">Number of draws</label>
-                                <input id="draw-amount" class="form-control" type="number" min=3 max=30 value=20 placeholder="Total # of draws"required>
+                            <label for="draw-total">Number of draws</label>
+                                <input id="draw-total" class="form-control" type="number" min=3 max=30 value=20 placeholder="Total # of draws" required>
                         </div>
                         <!-- Advanced options -->
                         <div class="card card-outline-info mb-3">
@@ -56,14 +56,25 @@
                                     <!--  Mulligan -->
                                     <div class="form-group">
                                         <span class="float-right text-highlight text-bold help-tooltip" data-toggle="tooltip" data-placement="left"
-                                              title="The simulation will perform a smarter mulligan where it willl also throw away excessive target cards.">?</span>
+                                              title="Results will be simulated instead of directly calculated to be able to include an intelligent mulligan of starting hand.">?</span>
                                         <label class="custom-control custom-checkbox">
                                             <input type="checkbox" class="custom-control-input" id="mulligan-checkbox">
                                             <span class="custom-control-indicator"></span>
                                             <span class="custom-control-description">
+                                                Include starting hand mulligan
                                                 <img src="images/thinking.png" width=20 alt="Vohiyo maymay">
-                                                Use <em>"intelligent"</em> mulligans
+                                                (slow)
                                                 <img src="images/thinking.png" width=20 alt="Vohiyo maymay">
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <!--  Show time taken -->
+                                    <div id="time-taken-form-group" class="form-group">
+                                        <label class="custom-control custom-checkbox">
+                                            <input type="checkbox" class="custom-control-input" id="time-checkbox">
+                                            <span class="custom-control-indicator"></span>
+                                            <span class="custom-control-description">
+                                                Show time taken
                                             </span>
                                         </label>
                                     </div>
@@ -78,39 +89,6 @@
                                                 Show effects on finished simulation
                                             </span>
                                         </label>
-                                    </div>
-                                    <!-- Precision tooltip -->
-                                    <span class="float-right text-highlight text-bold help-tooltip" data-toggle="tooltip" data-placement="left"
-                                          title="Higher accuracy yields more reliable result, but increases wait time.">?</span>
-                                    <div class="row">
-                                        <!-- Precision  -->
-                                        <div class="col-xl-6">
-                                            <div class="form-group precision-group">
-                                                <div class="btn-group" data-toggle="buttons">
-                                                  <label class="btn btn-primary">
-                                                    <input type="radio" name="precision" value="50000" autocomplete="off"> Fast
-                                                  </label>
-                                                  <label class="btn btn-primary active">
-                                                    <input type="radio" name="precision" value="200000" autocomplete="off" checked> Accurate
-                                                  </label>
-                                                  <label class="btn btn-primary">
-                                                    <input type="radio" name="precision" value="1000000" autocomplete="off"> V. Accurate
-                                                  </label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <!--  Show time taken -->
-                                        <div class="offset-xl-1 col-xl-5">
-                                            <div class="form-group">
-                                                <label class="custom-control custom-checkbox">
-                                                    <input type="checkbox" class="custom-control-input" id="time-checkbox">
-                                                    <span class="custom-control-indicator"></span>
-                                                    <span class="custom-control-description">
-                                                        Show time taken
-                                                    </span>
-                                                </label>
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -131,11 +109,8 @@
                                     <p class="question">Why can I not draw less than three cards?</p>
                                     <p class="answer">Because three cards is the minimum in any given game. It is the starting hand.</p>
 
-                                    <p class="question">How does the mulligan work?</p>
-                                    <p class="answer">For every game, the mulligan algorithm will look at the starting hand and throw away all non-target cards. If smart mulligan is used it mulligans all excessive target cards as well.</p>
-
-                                    <p class="question">Why does calculation take so much time?</p>
-                                    <p class="answer">Because the algorithm is rather crude. It simulates hundreds of thousands of separate games and looks at the total number of desired hands found. If you have a general mathematical solution (excluding mulligans even) I'm very interested!</p>
+                                    <p class="question">Why is it so slow when accounting for mulligans?</p>
+                                    <p class="answer">Without mulligans a mathematical formula is used. I'm not sure how to extend that formula to include mulligans yet so instead it simulates thousands of hands with intelligent mulligans and looks at the ratio of desired hands to total hands.</p>
 
                                     <p class="question">I do have some suggestions, how can I bring attention to them?</p>
                                     <p class="answer">Make a pull request on <a href="https://github.com/Sten-H/Sten-H.github.io" target="_blank">Github</a>. Add a whacky screen effect or whatever you feel like.</p>
@@ -145,7 +120,7 @@
                         <button id="calculate-btn" class="btn btn-primary btn-block">
                             Calculate chance <span class="glyphicon glyphicon-spin"></span>
                         </button>
-                    <form>
+                    </form>
                 </div>
             </div>
             <!--  Row presenting the probability results -->
@@ -201,6 +176,7 @@
         <script src="lib/tether-1.3.3/js/tether.js"></script>
         <script src="lib/bootstrap-4.0.0-alpha.6-dist/js/bootstrap.js"></script>
         <script src="probability.js"></script>
+        <script src="ping.js"></script>
         <script src="main.js"></script>
     </body>
 </html>

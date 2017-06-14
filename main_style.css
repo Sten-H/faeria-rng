@@ -39,7 +39,7 @@ header {
 hr {
     border-color: rgba(188,166,101, 0.7);
 }
-#error-wrapper, #time-taken-wrapper {
+#error-wrapper, #time-taken-wrapper, #time-taken-form-group {
     display: none;
 }
 .footer {
