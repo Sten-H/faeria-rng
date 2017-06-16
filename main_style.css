@@ -39,6 +39,56 @@ header {
 hr {
     border-color: rgba(188,166,101, 0.7);
 }
+/* Ping specific styles*/
+#base-creature {
+    display: none;
+}
+.card.creature p, .card.creature span, .card.creature h4 {
+    /*color: black;*/
+}
+.card.creature label{
+    color: white;
+}
+.card.creature {
+    /*background-color: blue;*/
+}
+.creature-name {
+    font-size: 1.6em;
+}
+.hp-text {
+    font-size: 1.3em;
+}
+.creature .to-die.glyphicon-ok {
+    color: greenyellow;
+}
+.creature .to-die.glyphicon-remove {
+    color: indianred;
+}
+/* Card columns amount at different resolutions */
+@media (max-width: 575px) {
+    .card-columns {
+        column-count: 1;
+    }
+    .card.creature {
+        margin-top: 1em;
+    }
+    #add-creature-btn {
+        margin-top: 1em;
+    }
+}
+
+@media (min-width: 576px) {
+    .card-columns {
+        column-count: 2;
+    }
+}
+
+@media (min-width: 768px) {
+    .card-columns {
+        column-count: 3;
+    }
+}
+/* End of ping specific styles */
 #error-wrapper, #time-taken-wrapper, #time-taken-form-group {
     display: none;
 }

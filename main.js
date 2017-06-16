@@ -1,34 +1,20 @@
-/*jshint esversion: 6 */
-let main = {};
-(function() {
+let uiHelpers = {};
+(function(context) {
     "use strict";
-    let cardInputs = [],
-        loadIcon = "glyphicon-repeat";
-    /**
-     * Prints time taken to execute function func to console, and returns taime taken and return value of func.
-     * @param  {function}    func function to time
-     * @param  {Array} args  func arguments
-     * @return {Array}       Array where first value is time taken in milliseconds and second value is func return value
-     */
-    function timeFunction(func, ...args) {
-        let t0 = performance.now(),
-            returnValue = func(...args);
-        return [performance.now() - t0, returnValue];
-    }
-    function spinAllGlyphicons() {
+    this.spinAllGlyphicons = function() {
         $.each($("span.glyphicon"), (index, icon) => spinGlyphicon($(icon), Math.random() >= 0.5, 1000));
-    }
+    };
     /**
      * Spins a glyphicon for a given duration.
      * @param span {Object} jquery object pointing to span with glyphicon class
      * @param reverse {Boolean} reverse spin direction if true
      * @param duration {Number} spin duration in milliseconds
      */
-    function spinGlyphicon(span, reverse=false, duration=200) {
+    this.spinGlyphicon = function (span, reverse=false, duration=200) {
         let spinClass = (reverse) ? "glyphicon-rev-spin" : "glyphicon-spin";
         span.addClass(spinClass);
         setTimeout(() => span.removeClass(spinClass), duration);
-    }
+    };
     /**
      * Shakes the selected element(s)
      * @param  {String} selector elements to select
@@ -36,7 +22,7 @@ let main = {};
      * @param  {int} strength the magnitude of the shakes
      * @param  {int} duration time in milliseconds before shake is stopped
      */
-    function rumbleElement(selector, rotate, strength, duration) {
+    this.rumbleElement = function(selector, rotate, strength, duration) {
         let rumble = {
             x: 10 * strength,
             y: 10 * strength,
@@ -47,28 +33,34 @@ let main = {};
         setTimeout(function() {
             $(selector).trigger('stopRumble');
         }, duration);
-    }
+    };
     /**
      * Shakes screen and some specific elements based on c
      * @param  {Number} c amount of desired hands
      */
-    function shakeScreen(c) {
+    this.shakeScreen = function(c) {
         let strength = c / 1000;
-        rumbleElement("#chance-number", true, strength, 1200);
+        this.rumbleElement("#chance-number", true, strength, 1200);
         if (c >= 700) {
-            rumbleElement("#title", true, strength / 1.5 , 1100);
+            this.rumbleElement("#title", true, strength / 1.5 , 1100);
         }
         if(c >= 950)
-            rumbleElement(".content", false, strength / 2 , 900);
+            this.rumbleElement(".content", false, strength / 2 , 900);
     }
+}).apply(uiHelpers);
+let main = {};
+(function() {
+    "use strict";
+    let cardInputs = [],
+        loadIcon = "glyphicon-repeat";
     /**
      * Creates effects on screen based on the amount of bad luck player
      * has painfully endured. A high c will create larger effects.
      * @param  {int} c the number of desired hands
      */
     function resultScreenEffects(c) {
-        shakeScreen(c);
-        spinAllGlyphicons(c);
+        uiHelpers.shakeScreen(c);
+        uiHelpers.spinAllGlyphicons(c);
         // TODO more effects can be added here
     }
     /**
@@ -115,7 +107,7 @@ let main = {};
                 cardInputs.forEach((input, index) => updateInputRow(input, index));
                 inputRow.remove();
             });
-            spinGlyphicon($("#add-card-btn").find("span"), true);
+            uiHelpers.spinGlyphicon($("#add-card-btn").find("span"), true);
         }
     }
     /**
@@ -251,10 +243,10 @@ let main = {};
                 timeTaken,
                 c;
             if(smartMulligan) {
-                [timeTaken, c] = timeFunction(simulation.run, cardInfo, drawAmount);
+                [timeTaken, c] = helpers.timeFunction(simulation.run, cardInfo, drawAmount);
             }
             else {
-                [timeTaken, c] = timeFunction(chance.calculate, cardInfo, drawAmount);
+                [timeTaken, c] = helpers.timeFunction(chance.calculate, cardInfo, drawAmount);
             }
             timeTaken = (timeTaken / 1000).toFixed(3); // convert to seconds
             // Convert to successful hands out of a thousand
@@ -280,7 +272,7 @@ let main = {};
         $("#add-card-btn").click(function(evt) {
             evt.preventDefault();
             addCardInput();
-            spinGlyphicon($(this).find("span"));
+            uiHelpers.spinGlyphicon($(this).find("span"));
             this.blur();
         });
         $("#remove-card-btn").click(function(evt) {

@@ -1,6 +1,17 @@
 let helpers = {};
 (function(context) {
     "use strict";
+    /**
+     * Returns time taken and return value of func.
+     * @param  {function}    func function to time
+     * @param  {Array} args  func arguments
+     * @return {Array}       Array where first value is time taken in milliseconds and second value is func return value
+     */
+    this.timeFunction = function(func, ...args) {
+        let t0 = performance.now(),
+            returnValue = func(...args);
+        return [performance.now() - t0, returnValue];
+    }
     this.range = function(start, end) {
         return [...new Array(end - start).keys()].map((val) => val + start);
     };
@@ -18,7 +29,73 @@ let helpers = {};
         return Math.floor(Math.random() * (max - min + 1)) + min;
     };
 }).apply(helpers);
-
+/**
+ * Ping namespace calculates probability of n amount of pings killing desired creatures
+ */
+let ping = {};
+(function(context) {
+    "use strict";
+    /**
+     * Filters outcome to only those where all creaturesToDie have died.
+     * @param creaturesToDie {Object|Array} Array of all creatures desired dead
+     * @param outcomes {Array}       outcomes to find desired outcomes in
+     * @returns {Number|Array}              Array of strings representing outcomes where all creaturesToDie have died
+     */
+    function desiredOutcomes(creaturesToDie, outcomes) {
+        if(creaturesToDie.length === 0) {
+            return outcomes;
+        } else {
+            const [creature, ...creaturesLeft] = creaturesToDie,
+                deathOutcomes = creatureDeathOutcomes(creature, outcomes);
+            return desiredOutcomes(creaturesLeft, deathOutcomes);
+        }
+    }
+    /**
+     * Filters array of outcome strings to only outcomes where given creature dies
+     * @param creature      creature to die
+     * @param outcomes      outcomes to check for death in
+     * @returns {Number|Array}  array of strings representing outcomes
+     */
+    function creatureDeathOutcomes(creature, outcomes) {
+        return outcomes.filter((outcome) => {
+            return outcome.filter((creatureHit) => creatureHit === creature.name).length >= creature.hp;
+        });
+    }
+    /**
+     * Builds each possible outcome as a string one ping at a time. One ping is represented as the name
+     * of the creature it hit (ex: "A"), and one outcome is represented as a string of each hit
+     * (ex: "ABAA" in a 4 ping situation, creature "A" received 3 hits))
+     * @param pings
+     * @param creatures         all creatures on board (including God)
+     * @param outcomes          array to push each outcome to
+     * @param currentOutcome    should not be assigned manually, works as an internal accumulator for each outcome
+     */
+    function pingOutcomes(pings, creatures, outcomes, currentOutcome=[]) {
+        if(pings <= 0) {
+            outcomes.push(currentOutcome);
+            return;
+        }
+        return creatures.map( (creature) => {
+            return pingOutcomes(pings - 1, creatures, outcomes, [...currentOutcome, creature.name]);
+        });
+    }
+    this.calculate = function(creatures, pingAmount) {
+        let allOutcomes = [];
+        pingOutcomes(pingAmount, creatures, allOutcomes);
+        const creaturesToDie = creatures.filter((creature) => creature.toDie),
+            desired = desiredOutcomes(creaturesToDie, allOutcomes);
+        return (desired.length / allOutcomes.length);
+    };
+    // Function prints computation times and results of simulation and calculation with same input values
+    this.compare = function(creatures, pings) {
+        console.log(`creatures to die in ${pings} pings`);
+        const toDieString = creatures.filter((c) => c.toDie).map((c) => `${c.name} with ${c.hp} hp`).join(', ');
+        console.log(toDieString);
+        // filter god from pau calc
+        let [timeTaken, c] = helpers.timeFunction(this.calculate, creatures, pings);
+        console.log("oscar: " + (timeTaken / 1000).toFixed(3) + " seconds taken", "probability: " + (c * 100).toFixed(3) + "%");
+    };
+}).apply(ping);
 /**
  * Chance namespace calculates probability mathematically using combinatorics
  */
@@ -75,7 +152,7 @@ let chance = {};
                 drawsLeft = Math.max(draws - drawn, 0);
             return [...combo, [nonTargetAmount, drawsLeft]];
         });
-    }1
+    }
     /**
      * Creates all valid combination of target card draws. Draws only from target cards, the deck is not considered.
      * Every valid card draw is represented as an array with two values [total, drawn], for a targetCard {needed: 2, amount: 3}
