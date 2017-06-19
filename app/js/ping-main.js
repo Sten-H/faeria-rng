@@ -38,7 +38,7 @@
             .map((index, card) => {
             const toDie = Number($(card).find("select").val()) === 1,
                 hp = Number($(card).find("input.creature-hp").val());
-            return {toDie: toDie, hp: hp, name: index};
+            return {toDie: toDie, hp: hp, activeHp: 0, name: index + 1};
         })];
     }
 
@@ -60,7 +60,7 @@
     function calculateListener() {
         const creatures = getCreatureInput(),
             pings = getPingInput(),
-            [time, c] = helpers.timeFunction(ping.calculate, creatures, pings);
+            [time, c] = helpers.timeFunction(ping.calculate, creatures, pings, true);
         // Update results
         uiHelpers.updateResults(time, c);
         // Screen effects

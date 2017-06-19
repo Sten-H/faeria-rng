@@ -6,21 +6,24 @@
     {% include 'partials/title.nunjucks' %}
 {% endblock %}
 {% block content %}
+    {# CARD AREA #}
     <div class="col-12">
         <div class="card-columns" id="card-container">
+            <!-- Draw card -->
             {{ cards.create("Draws", "draws", "draw-card") }}
+            <!-- Options card -->
             {{ cards.create("Options", "options", "options-card") }}
         </div>
     </div>
-    {# Buttons #}
+    {# BUTTONS #}
     <div class="col-12">
         {{ cards.createCardButtons("card") }}
     </div>
-    <!--  Row presenting the probability results -->
+    <!--  RESULTS -->
     <div class="col-12 my-2">
         {{ general.createResultsDisplay("hands") }}
     </div>
-    <!-- FAQ card -->
+    <!-- FAQ  -->
     <div class="col-12">
         {{ general.createFaq(faq.draw) }}
     </div>

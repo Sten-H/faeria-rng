@@ -43,16 +43,17 @@
 {% endmacro %}
 
 {% macro create(title, type, id) %}
-    <div class="card
+    <div class="card rumble
         {% if type == "creature" %} creature card-info
         {% elseif type == "god" %}  creature god card-success
         {% elseif type == "to-draw" %} draw card-info
+        {% elseif type == "options" %} card-success
         {% else %} card-danger
         {% endif %}
         text-center"
          id={{ id }}
         >
-        <div class="card-block">
+        <div class="card-block {% if type == "creature" or type == "to-draw" %}pb-0 {% endif %}">
             <h4 class="card-title lead">
                 {{ title }}
             </h4>
@@ -74,7 +75,7 @@
         </div>
         {% if type == "creature" or type == "to-draw" %}
             <footer>
-                <button class="btn btn-danger float-left m-1 remove-card-btn"><span class="glyphicon glyphicon-remove"></span></button>
+                <button class="btn btn-danger float-right m-1 remove-card-btn"><span class="glyphicon glyphicon-remove"></span></button>
             </footer>
         {% endif %}
     </div>

@@ -4,7 +4,7 @@ let uiHelpers = {};
     this.init= function() {
         // Initialize rumble effect on elements
         $(".rumble").jrumble();
-        // This sets the options collapse arrow the right way at start
+        // This sets the collapse arrow the right way at start for collapsible cards
         $(".card-header a").toggleClass("collapsed");
         // Initialize tooltips
         $('[data-toggle="tooltip"]').tooltip();
@@ -90,8 +90,11 @@ let uiHelpers = {};
         if (c >= 0.700) {
             this.rumbleElement("#title", true, c / 1.5 , 1100);
         }
-        if(c >= 0.950)
-            this.rumbleElement(".content", false, c / 2 , 900);
+        if(c >= 0.950) {
+            // FIXME rumbling cards bugs on draw page. It's a fun effect, try to fix it.
+            // this.rumbleElement(".card", true, c / 2, 800);
+            this.rumbleElement(".content", false, c / 2, 900);
+        }
     }
 }).apply(uiHelpers);
 

@@ -5,18 +5,18 @@ let ping = {};
 (function(context) {
     "use strict";
     /**
-     * Filters outcome to only those where all creaturesToDie have died.
-     * @param creaturesToDie {Object|Array} Array of all creatures desired dead
+     * Filters outcome to only those where all creatures have died.
+     * @param creatures {Object|Array} Array of all creatures desired dead
      * @param outcomes {Array}       outcomes to find desired outcomes in
-     * @returns {Number|Array}              Array of strings representing outcomes where all creaturesToDie have died
+     * @returns {Number|Array}              Array of strings representing outcomes where all creatures have died
      */
-    function desiredOutcomes(creaturesToDie, outcomes) {
-        if(creaturesToDie.length === 0) {
+    function allDesiredOutcomes(creatures, outcomes) {
+        if(creatures.length === 0) {
             return outcomes;
         } else {
-            const [creature, ...creaturesLeft] = creaturesToDie,
-                deathOutcomes = creatureDeathOutcomes(creature, outcomes);
-            return desiredOutcomes(creaturesLeft, deathOutcomes);
+            const [creature, ...creaturesLeft] = creatures,
+                desiredOutcomes = creatureDesiredOutcome(creature, outcomes);
+            return allDesiredOutcomes(creaturesLeft, desiredOutcomes);
         }
     }
     /**
@@ -25,10 +25,54 @@ let ping = {};
      * @param outcomes      outcomes to check for death in
      * @returns {Number|Array}  array of strings representing outcomes
      */
-    function creatureDeathOutcomes(creature, outcomes) {
+    function creatureDesiredOutcome(creature, outcomes) {
         return outcomes.filter((outcome) => {
-            return outcome.filter((creatureHit) => creatureHit === creature.name).length >= creature.hp;
+            const dmgTaken = outcome.filter((creatureHit) => creatureHit === creature.name).length;
+            if (creature.toDie)
+                return dmgTaken >= creature.hp;
+            else
+                return dmgTaken < creature.hp;
         });
+    }
+    function lifeOutcomes(creature, outcomes) {
+        return outcomes.filter((outcome) => {
+            return outcome.filter((creatureHit) => creatureHit === creature.name).length < creature.hp;
+        });
+    }
+    /**
+     * Returns the index of creature in array
+     * @param arr
+     * @param creature
+     * @returns {number}
+     */
+    function creatureIndex(arr, creature) {
+        return arr.map(a => a.name).indexOf(creature.name)
+    }
+    /**
+     * Filters out outcomes where for example a 2hp creature receives 3 pings. This is not a good approach because
+     * then that death outcome is lost, it should not be filtered out rather that killing ping should be elsewhere.
+     * @param outcomes
+     * @param creatures
+     * @returns {Array}
+     */
+    function filterOverdamage(outcomes, creatures) {
+        console.log(outcomes);
+        let arr = outcomes.filter((outcome) => {
+            return creatures.every((creature) => {
+                let dmg = outcome.reduce((acc, targetName) => {
+                    if (targetName === creature.name)
+                        return acc + 1;
+                    else
+                        return acc;
+                }, 0);
+                return dmg <= creature.hp;
+            });
+        });
+        console.log(arr);
+        return arr;
+    }
+    function resetCreatures(creatures) {
+        creatures.forEach((c) => c.activeHp = c.hp);
     }
     /**
      * Builds each possible outcome as a string one ping at a time. One ping is represented as the name
@@ -48,23 +92,55 @@ let ping = {};
             return pingOutcomes(pings - 1, creatures, outcomes, [...currentOutcome, creature.name]);
         });
     }
-    this.calculate = function(creatures, pingAmount) {
+    this.calculate = function(creatures, pingAmount, benchmark=false) {
+        // TODO try making creatures an array of just simple datatypes instead of an object to allow for deep copies. Not sure this is the problem but worth trying
         let allOutcomes = [];
+        resetCreatures(creatures);
         pingOutcomes(pingAmount, creatures, allOutcomes);
-        const creaturesToDie = creatures.filter((creature) => creature.toDie),
-            desired = desiredOutcomes(creaturesToDie, allOutcomes);
-        return (desired.length / allOutcomes.length);
-    };
-    // Function prints computation times and results of simulation and calculation with same input values
-    this.compare = function(creatures, pings) {
-        console.log(`creatures to die in ${pings} pings`);
-        const toDieString = creatures.filter((c) => c.toDie).map((c) => `${c.name} with ${c.hp} hp`).join(', ');
-        console.log(toDieString);
-        // filter god from pau calc
-        let [timeTaken, c] = helpers.timeFunction(this.calculate, creatures, pings);
-        console.log("oscar: " + (timeTaken / 1000).toFixed(3) + " seconds taken", "probability: " + (c * 100).toFixed(3) + "%");
+        const
+            filteredOutcomes = filterOverdamage(allOutcomes, creatures),
+            // filteredOutcomes = allOutcomes,  // I want to filter out overdamage here, or don't do the filter approach
+            desired = allDesiredOutcomes(creatures, filteredOutcomes);
+        if (benchmark)
+            pingSimulation.run(creatures, pingAmount);
+        return (desired.length / filteredOutcomes.length);
     };
 }).apply(ping);
+// Simulation to test results against
+let pingSimulation = {};
+(function(context) {
+    function creatureIndex(arr, creature) {
+        return arr.map(a => a.name).indexOf(creature.name)
+    }
+    function resetCreatures(creatures) {
+        creatures.forEach((c) => c.activeHp = c.hp)
+    }
+    function trial(pings, creatures) {
+        for(let i = 0; i < pings; i++) {
+            if(creatures.length === 0)
+                break;
+            let target = creatures[Math.floor(Math.random() * creatures.length)];
+            target.activeHp -= 1;
+            if (target.activeHp === 0) {
+                let index = creatureIndex(creatures, target);
+                creatures.splice(index, 1);
+            }
+        }
+        return creatures.every((c) =>
+            ((c.toDie && c.activeHp <= 0) || (!c.toDie && c.activeHp > 0)));
+    }
+    "use strict";
+    this.run = function (creatures, pings, tries=10000) {
+        let success = 0;
+        for(let i = 0; i < tries; i++) {
+            resetCreatures(creatures);
+            if(trial(pings, creatures.slice(0), tries))
+                success++;
+        }
+        console.log(success/tries);
+        return success/tries;
+    }
+}).apply(pingSimulation);
 /**
  * Chance namespace calculates probability mathematically using combinatorics
  */
@@ -154,7 +230,6 @@ let chance = {};
         return combinationCount(allValidCombinations) / choose(DECK_SIZE, draws);
     };
 }).apply(chance);
-
 /**
  * simulation namespace calculates probability by simulating many hands drawn and looking at the number of desired hands
  * found in relation to all hands drawn. It also simulates intelligent mulligans which is its only advantage over
@@ -335,3 +410,5 @@ let simulation = {};
         return DECK_SIZE;
     };
 }).apply(simulation);
+exports.ping = ping;
+exports.pingSim = pingSimulation;
