@@ -1,0 +1,40 @@
+{% extends "main-layout.nunjucks" %}
+{% import 'macros/general.nunjucks' as general %}
+{% import 'macros/cards.nunjucks' as cards %}
+
+{% block title %}
+    {% include 'partials/title.nunjucks' %}
+{% endblock %}
+{% block content %}
+    {# CARD AREA #}
+    <div class="col-12">
+        <div class="card-columns" id="card-container">
+            <!-- Ping card -->
+            {{ cards.create("Pings", "pings", "ping-card") }}
+            <!-- God card -->
+            {{ cards.create("God", "god") }}
+        </div>
+    </div>
+    {# BUTTONS #}
+    <div class="col-12">
+        {{ cards.createCardButtons("creature") }}
+    </div>
+    <!--  RESULTS -->
+    <div class="col-12 my-2">
+        {{ general.createResultsDisplay("games") }}
+    </div>
+    <!-- FAQ  -->
+    <div class="col-12">
+        {{ general.createFaq(faq.ping, "ping") }}
+    </div>
+    {# BASE CREATURE CARD, only used for templating #}
+    {{ cards.create("Creature", "creature", "base") }}
+{% endblock %}
+{% block footer %}
+    {% include "partials/footer.nunjucks" %}
+{% endblock %}
+{% block scripts %}
+    <script src="js/probability.js"></script>
+    <script src="js/helpers.js"></script>
+    <script src="js/ping-main.js"></script>
+{% endblock %}

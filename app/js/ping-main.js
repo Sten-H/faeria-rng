@@ -1,7 +1,7 @@
 (function() {
     "use strict";
     // Template for creature cards
-    const base = $("#base-creature");
+    const base = $("#base");
 
     /**
      * Changes creature card color depending on desired life status
@@ -30,42 +30,12 @@
     }
 
     /**
-     * Remove a creature card
-     */
-    function removeCreatureListener() {
-        const card = $(this).closest(".card.creature");
-        card.slideToggle("fast", function() {
-            card.remove();
-        });
-        // Button spin effect
-        uiHelpers.spinGlyphicon($("#add-creature-btn span"), true);
-    }
-
-    /**
-     * Add a new creature card to be considered for probability.
-     */
-    function addCreatureListener() {
-        let newCreature = base.clone().addClass("creature");
-        newCreature.removeAttr('id');
-        newCreature.find(".remove-creature-btn").click(removeCreatureListener);
-        newCreature.find("select").change(lifeStatusListener);
-        newCreature.hide();
-        $("#creature-container").append(newCreature);
-        newCreature.slideToggle("fast");
-        // Button spin effect
-        uiHelpers.spinGlyphicon($(this).find("span"));
-    }
-    function updateResults(time, c) {
-        $("#chance-number").html((c.toFixed(3) * 1000));
-        $("#time-taken").html((time / 1000).toFixed(4)).show();
-    }
-
-    /**
      * Collects user creature input and creates an array of creature objects
      * @returns {Array}  array with objects containing toDie, hp, name variables
      */
     function getCreatureInput() {
-        return [...$(".card.creature").map((index, card) => {
+        return [...$(".card.creature").not("#base")  // The spread is used to get rid of jquery object
+            .map((index, card) => {
             const toDie = Number($(card).find("select").val()) === 1,
                 hp = Number($(card).find("input.creature-hp").val());
             return {toDie: toDie, hp: hp, name: index};
@@ -78,7 +48,7 @@
      * @returns {number}    adjusted ping value
      */
     function getPingInput() {
-        const pingInput = $(".card.ping-card").find("input"),
+        const pingInput = $("#ping-card").find("input"),
             pingAdjusted = Math.min(Math.max(pingInput.val(), 1), 12);
         pingInput.val(pingAdjusted);
         return pingAdjusted;
@@ -92,14 +62,14 @@
             pings = getPingInput(),
             [time, c] = helpers.timeFunction(ping.calculate, creatures, pings);
         // Update results
-        updateResults(time, c);
+        uiHelpers.updateResults(time, c);
         // Screen effects
-        uiHelpers.shakeScreen(c * 1000);
+        uiHelpers.shakeScreen(c);
     }
     $(document).ready(() => {
-        $("#time-taken-wrapper").show();
         $(".creature.god select").change(lifeStatusListener);
-        $("#add-creature-btn").click(addCreatureListener);
-        $("#calculate-ping-btn").click(calculateListener);
+        $("#add-card-btn").click(() => uiHelpers.addCardListener(base));
+        $("#calculate-btn").click(calculateListener);
+        uiHelpers.init();
     });
 })();

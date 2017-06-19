@@ -1,0 +1,38 @@
+{% extends "main-layout.nunjucks" %}
+{% import 'macros/general.nunjucks' as general %}
+{% import 'macros/cards.nunjucks' as cards %}
+
+{% block title %}
+    {% include 'partials/title.nunjucks' %}
+{% endblock %}
+{% block content %}
+    <div class="col-12">
+        <div class="card-columns" id="card-container">
+            {{ cards.create("Draws", "draws", "draw-card") }}
+            {{ cards.create("Options", "options", "options-card") }}
+        </div>
+    </div>
+    {# Buttons #}
+    <div class="col-12">
+        {{ cards.createCardButtons("card") }}
+    </div>
+    <!--  Row presenting the probability results -->
+    <div class="col-12 my-2">
+        {{ general.createResultsDisplay("hands") }}
+    </div>
+    <!-- FAQ card -->
+    <div class="col-12">
+        {{ general.createFaq(faq.draw) }}
+    </div>
+    {# BASE TO-DRAW CARD, only used for templating #}
+    {{ cards.create("Card", "to-draw", "base") }}
+{% endblock %}
+{% block footer %}
+    {% include "partials/footer.nunjucks" %}
+{% endblock %}
+{% block scripts %}
+    <script src="js/probability.js"></script>
+    <script src="js/helpers.js"></script>
+    <script src="js/main.js"></script>
+{% endblock %}
+

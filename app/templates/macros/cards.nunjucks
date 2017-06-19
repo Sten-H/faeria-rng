@@ -1,0 +1,89 @@
+{% set mulliganCheckbox %}
+    <div class="form-group">
+        <span data-toggle="tooltip" data-placement="top"
+              title="Results will be simulated rather than calculated to be able to include an intelligent mulligan of starting hand.">
+            <label class="custom-control custom-checkbox">
+                <input type="checkbox" class="custom-control-input" id="mulligan-checkbox">
+                <span class="custom-control-indicator"></span>
+                <span class="custom-control-description">
+                    Include mulligan (slow)
+                    <img src="images/thinking.png" width=20 alt="thinking">
+                </span>
+            </label>
+        </span>
+    </div>
+{% endset %}
+
+{% macro getCreatureInput(default, min, max, status) %}
+        <div class="form-group row">
+            <label class="col-6 col-form-label">Status: </label>
+            <select class="custom-select col-6 creature-status">
+                <option value="1" {%  if status == "dies" %} selected {% endif %}>Dies</option>
+                <option value="0" {% if status != "dies" %} selected {% endif %}>Lives</option>
+            </select>
+        </div>
+        {{ createLabeledInput("HP", "creature-hp", min, max, default) }}
+{% endmacro %}
+
+{% macro getCardInput() %}
+    {{ createLabeledInput("Need", "card-need", 1, 3, 1) }}
+    {{ createLabeledInput("Deck", "card-deck", 1, 3, 3) }}
+{% endmacro %}
+{% macro createInputField(classes, min, max, default) %}
+    <input class="form-control {{ classes }}" type="number" value={{ default }} min={{ min }} max={{ max }}>
+{% endmacro %}
+
+{% macro createLabeledInput(label, classes, min, max, default) %}
+    <div class="form-group row">
+        <label class="col-6 col-form-label">{{ label }}:</label>
+        <div class="col-6 px-0">
+            {{ createInputField(classes, min, max, default) }}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro create(title, type, id) %}
+    <div class="card
+        {% if type == "creature" %} creature card-info
+        {% elseif type == "god" %}  creature god card-success
+        {% elseif type == "to-draw" %} draw card-info
+        {% else %} card-danger
+        {% endif %}
+        text-center"
+         id={{ id }}
+        >
+        <div class="card-block">
+            <h4 class="card-title lead">
+                {{ title }}
+            </h4>
+            {% if type == "creature" %}
+                {{ getCreatureInput(2, 1, 20, "dies")| safe }}
+            {% elseif type =="god" %}
+                {{ getCreatureInput(16, 1, 20, "lives")| safe }}
+            {% elseif type == "pings" %}
+                {{ createInputField("ping-amount", 0, 12, 4) }}
+            {%  elseif type == "draws" %}
+                {{ createInputField("draw-amount", 3, 30, 4) }}
+            {% elseif type == "to-draw" %}
+                {{ getCardInput() }}
+            {% elseif type == "options" %}
+                {{ mulliganCheckbox | safe }}
+            {% else %}
+
+            {% endif %}
+        </div>
+        {% if type == "creature" or type == "to-draw" %}
+            <footer>
+                <button class="btn btn-danger float-left m-1 remove-card-btn"><span class="glyphicon glyphicon-remove"></span></button>
+            </footer>
+        {% endif %}
+    </div>
+{% endmacro %}
+{% macro createCardButtons(addType) %}
+    <button id="add-card-btn" class="btn btn-info btn-block">
+        Add {{ addType }} <span id="add-icon" class="glyphicon glyphicon-plus"></span>
+    </button>
+    <button id="calculate-btn" class="btn btn-primary btn-block">
+        Calculate <span class="glyphicon glyphicon-spin"></span>
+    </button>
+{% endmacro %}

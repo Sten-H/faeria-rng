@@ -1,34 +1,3 @@
-let helpers = {};
-(function(context) {
-    "use strict";
-    /**
-     * Returns time taken and return value of func.
-     * @param  {function}    func function to time
-     * @param  {Array} args  func arguments
-     * @return {Array}       Array where first value is time taken in milliseconds and second value is func return value
-     */
-    this.timeFunction = function(func, ...args) {
-        let t0 = performance.now(),
-            returnValue = func(...args);
-        return [performance.now() - t0, returnValue];
-    }
-    this.range = function(start, end) {
-        return [...new Array(end - start).keys()].map((val) => val + start);
-    };
-    this.rangeInclusive = function(start, end) {
-        return this.range(start, end + 1);
-    };
-    this.getRandomInt = function(min, max) {
-        min = Math.ceil(min);
-        max = Math.floor(max);
-        return Math.floor(Math.random() * (max - min)) + min;
-    };
-    this.getRandomIntInclusive = function (min, max) {
-        min = Math.ceil(min);
-        max = Math.floor(max);
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-    };
-}).apply(helpers);
 /**
  * Ping namespace calculates probability of n amount of pings killing desired creatures
  */

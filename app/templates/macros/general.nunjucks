@@ -1,0 +1,54 @@
+{% macro createFaq(activeFaq, type) %}
+    <div class="card card-outline-info mb-3">
+        <div class="card-header transparent-bg">
+            <a data-toggle="collapse" href="#faq-wrapper" aria-expanded="true" aria-controls="faq-wrapper">
+                FAQ
+            </a>
+        </div>
+        <!--  Without wrapper, collapse is laggy  -->
+        <div id="faq-wrapper" class="collapse">
+            {% if type == "ping" %}
+                <div class="row">
+                    <div class="offset-3 col-6">
+                        <img class="img-fluid" src="https://raw.githubusercontent.com/abrakam/Faeria_Cards/master/CardExport/English/358.png">
+                    </div>
+                    {#<div class="col-4">#}
+                        {#<img class="img-fluid" src="https://raw.githubusercontent.com/abrakam/Faeria_Cards/master/CardExport/English/314.png">#}
+                    {#</div>#}
+                    {#<div class="col-4">#}
+                        {#<img class="img-fluid" src="https://raw.githubusercontent.com/abrakam/Faeria_Cards/master/CardExport/English/250.png">#}
+                    {#</div>#}
+                </div>
+            {% endif %}
+            <div class="card-block">
+                {% for qa in activeFaq %}
+                    <p class="question">{{ qa.q | safe}}</p>
+                    <p class="answer">{{ qa.a | safe}}</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endmacro %}
+{% macro createResultsDisplay(type) %}
+    <div id="results-wrapper">
+        <h3>
+            <span class='text-highlight rumble' id='chance-number'> --- </span>
+            out of
+            <span class='text-highlight'>1000</span>
+            {{ type }}
+            would have desired outcome.
+        </h3>
+        <div id="time-taken-wrapper">
+            <hr class="my-1">
+            <p class="lead">Completed in
+                <span class="text-highlight" id="time-taken">---</span>
+                seconds</p>
+        </div>
+    </div>
+    <div id="error-wrapper">
+        <h4>
+            <span class="badge badge-danger">Error</span>
+            <span id="error-message">Something went very wrong</span>
+        </h4>
+    </div>
+{% endmacro %}

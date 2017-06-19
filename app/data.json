@@ -1,0 +1,17 @@
+{
+  "faq": {
+    "draw": [
+      {"q": "What is this?", "a": "This is a tool to help <a href='https://www.faeria.com' target='_blank'>Faeria</a> players more accurately be able to complain about how unlucky they are not to draw a specific card or a combination of cards."},
+      {"q": "Why can I not draw less than three cards?", "a": "Because three cards is the minimum in any given game. It is the starting hand."},
+      {"q": "Why is it so slow when accounting for mulligans?", "a": "Without mulligans a mathematical formula is used. I'm not sure how to extend that formula to include mulligans yet so instead it simulates thousands of hands with intelligent mulligans and looks at the ratio of desired hands to total hands."},
+      {"q": "I do have some suggestions, how can I bring attention to them?", "a": "Make a pull request on <a href='https://github.com/Sten-H/Sten-H.github.io' target='_blank'>Github</a>. Add a whacky screen effect or whatever you feel like."}
+    ],
+    "ping": [
+      {"q": "What is a ping?", "a": "A ping in card games usually refers to dealing 1 damage. In faeria there are some cards that will send <em>n</em> amount of pings randomly between all enemy creatures and the enemy god (representation of enemy player)."},
+      {"q": "Can a target be damaged beyond its hp?", "a": "No once it has received a ping that brings its hp to 0 it is no longer considered a target for remaining pings. So if you have 4 pings and 2 creatures with 2 hp, they will both die in all outcomes."},
+      {"q": "Is this working properly?", "a": "Not right now, pings can hit creatures that have died. It still generates correct results if there is one creature set to live with hp > ping amounts. This is because then every overdamage ping can be counted as a ping on that creature, and we don't care about that creature's life status in that situation. This is of course not intended behaviour and should be fixed."},
+      {"q": "Why is performance so bad with high ping amounts and many creatures?", "a": "If creature amount is <em>n</em> and ping amount is <em>k</em> the complexity is O(n<sup>k</sup>n). n<sup>k</sup> are the number of outcomes. Each creature marked to die then filters the outcomes for only outcomes where it dies. If there are 5 creatures (2 set to die) and 9 pings that's 5<sup>9</sup>2 = 3 906 250 . Pretty bad, huh? Making complexity <em>just</em> n<sup>k</sup> should be pretty easy.</p>"},
+      {"q": "This sounds really simple...", "a": "That's not a question and also thanks for making me feel bad <strong>:(</strong>"}
+    ]
+  }
+}
