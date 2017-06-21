@@ -1,4 +1,4 @@
-<header>
+<header class="px-md-5 pt-md-2">
     <h1 class="display-4 rumble" id="title">Rage Assistant</h1>
     <hr class="my-0">
     <p class="lead text-highlight">Start complaining more accurately</p>

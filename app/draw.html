@@ -44,7 +44,7 @@
                 
         <div class="col-12">
             <a class="lead"
-               href="index.html">Draws<span class="glyphicon glyphicon-menu-right"></span>
+               href="ping.html">Pings<span class="glyphicon glyphicon-menu-right"></span>
             </a>
         </div>
         <div class="col-12">
@@ -62,65 +62,66 @@
     </div>
 
 
-            <!-- Ping card -->
+            <!-- Draw card -->
             
+    
     <div class="card rumble
          card-danger
         
         text-center"
-         id=ping-card
+         id=draw-card
     >
         <div class="card-block
              ">
             <h4 class="card-title lead">
-                Pings
+                Draws
             </h4>
             
                 
-    <input class="form-control ping-amount" type="number" value=4 min=0 max=12>
+    <input class="form-control draw-amount" type="number" value=4 min=3 max=30>
 
             
         </div>
         
     </div>
 
-            <!-- God card -->
+
+            <!-- Options card -->
             
+    
     <div class="card rumble
-          creature god card-success
+         card-success
         
         text-center"
-         id=
+         id=options-card
     >
         <div class="card-block
+              pb-1
              ">
             <h4 class="card-title lead">
-                God
+                Options
             </h4>
             
                 
-    <div class="form-group row">
-        <label class="col-6 col-form-label">Status: </label>
-        <select class="custom-select col-6 creature-status">
-            <option value="1" >Dies</option>
-            <option value="0"  selected >Lives</option>
-        </select>
+    <div class="form-group">
+        <span data-toggle="tooltip" data-placement="top"
+              title="Results will be simulated rather than calculated to be able to include an intelligent mulligan of starting hand.">
+            <label class="custom-control custom-checkbox">
+                <input type="checkbox" class="custom-control-input" id="mulligan-checkbox">
+                <span class="custom-control-indicator"></span>
+                <span class="custom-control-description">
+                    Include mulligan (slow)
+                    <img src="images/thinking.png" width=20 alt="thinking">
+                </span>
+            </label>
+        </span>
     </div>
-    
-    <div class="form-group row">
-        <label class="col-6 col-form-label">HP:</label>
-        <div class="col-6 px-0">
-            
-    <input class="form-control creature-hp" type="number" value=16 min=1 max=20>
-
-        </div>
-    </div>
-
 
             
         </div>
         
     </div>
+
 
         </div>
     </div>
@@ -128,7 +129,7 @@
     <div class="col-12">
         
     <button id="add-card-btn" class="btn btn-info btn-block">
-        Add creature <span id="add-icon" class="glyphicon glyphicon-plus"></span>
+        Add card <span id="add-icon" class="glyphicon glyphicon-plus"></span>
     </button>
     <button id="calculate-btn" class="btn btn-primary btn-block">
         Calculate <span class="glyphicon glyphicon-spin"></span>
@@ -143,7 +144,7 @@
             <span class='text-highlight rumble' id='chance-number'> --- </span>
             out of
             <span class='text-highlight'>1000</span>
-            games
+            hands
             would have desired outcome.
         </h3>
         <div id="time-taken-wrapper">
@@ -173,34 +174,19 @@
         <!--  Without wrapper, collapse is laggy  -->
         <div id="faq-wrapper" class="collapse">
             
-                <div class="row">
-                    <div class="offset-3 col-6">
-                        <img class="img-fluid" src="https://raw.githubusercontent.com/abrakam/Faeria_Cards/master/CardExport/English/358.png">
-                    </div>
-                    
-                        
-                    
-                    
-                        
-                    
-                </div>
-            
             <div class="card-block">
                 
-                    <p class="question">What is a ping?</p>
-                    <p class="answer">A ping in card games usually refers to dealing 1 damage. In faeria there are some cards that will send <em>n</em> amount of pings randomly between all enemy creatures and the enemy god (representation of enemy player).</p>
+                    <p class="question">What is this?</p>
+                    <p class="answer">This is a tool to help <a href='https://www.faeria.com' target='_blank'>Faeria</a> players more accurately be able to complain about how unlucky they are not to draw a specific card or a combination of cards.</p>
                 
-                    <p class="question">Can a target be damaged beyond its hp?</p>
-                    <p class="answer">No once it has received a ping that brings its hp to 0 it is no longer considered a target for remaining pings. So if you have 4 pings and 2 creatures with 2 hp, they will both die in all outcomes.</p>
+                    <p class="question">Why can I not draw less than three cards?</p>
+                    <p class="answer">Because three cards is the minimum in any given game. It is the starting hand.</p>
                 
-                    <p class="question">Is this working properly?</p>
-                    <p class="answer">Not right now, pings can hit creatures that have died. It still generates correct results if there is one creature set to live with hp > ping amounts. This is because then every overdamage ping can be counted as a ping on that creature, and we don't care about that creature's life status in that situation. This is of course not intended behaviour and should be fixed.</p>
+                    <p class="question">Why is it so slow when accounting for mulligans?</p>
+                    <p class="answer">Without mulligans a mathematical formula is used. I'm not sure how to extend that formula to include mulligans yet so instead it simulates thousands of hands with intelligent mulligans and looks at the ratio of desired hands to total hands.</p>
                 
-                    <p class="question">Why is performance so bad with high ping amounts and many creatures?</p>
-                    <p class="answer">If creature amount is <em>n</em> and ping amount is <em>k</em> the complexity is O(n<sup>k</sup>n). n<sup>k</sup> are the number of outcomes. Each creature marked to die then filters the outcomes for only outcomes where it dies. If there are 5 creatures (2 set to die) and 9 pings that's 5<sup>9</sup>2 = 3 906 250 . Pretty bad, huh? Making complexity <em>just</em> n<sup>k</sup> should be pretty easy.</p></p>
-                
-                    <p class="question">This sounds really simple...</p>
-                    <p class="answer">That's not a question and also thanks for making me feel bad <strong>:(</strong></p>
+                    <p class="question">I do have some suggestions, how can I bring attention to them?</p>
+                    <p class="answer">Make a pull request on <a href='https://github.com/Sten-H/Sten-H.github.io' target='_blank'>Github</a>. Add a whacky screen effect or whatever you feel like.</p>
                 
             </div>
         </div>
@@ -210,7 +196,7 @@
     
     
     <div class="card rumble
-         creature card-info
+         draw card-info
         
         text-center"
          id=base
@@ -219,23 +205,26 @@
              pb-0
              ">
             <h4 class="card-title lead">
-                Creature
+                Card
             </h4>
             
                 
-    <div class="form-group row">
-        <label class="col-6 col-form-label">Status: </label>
-        <select class="custom-select col-6 creature-status">
-            <option value="1"  selected >Dies</option>
-            <option value="0" >Lives</option>
-        </select>
-    </div>
     
     <div class="form-group row">
-        <label class="col-6 col-form-label">HP:</label>
+        <label class="col-6 col-form-label">Need:</label>
         <div class="col-6 px-0">
             
-    <input class="form-control creature-hp" type="number" value=2 min=1 max=20>
+    <input class="form-control card-need" type="number" value=1 min=1 max=3>
+
+        </div>
+    </div>
+
+    
+    <div class="form-group row">
+        <label class="col-6 col-form-label">Deck:</label>
+        <div class="col-6 px-0">
+            
+    <input class="form-control card-deck" type="number" value=3 min=1 max=3>
 
         </div>
     </div>
@@ -288,7 +277,7 @@
     <script src="js/simulation.js"></script>
     <script src="js/calculation.js"></script>
     <script src="js/helpers.js"></script>
-    <script src="js/ping-main.js"></script>
+    <script src="js/main.js"></script>
 
 </body>
 </html>

@@ -30,7 +30,14 @@ header {
 hr {
     border-color: rgba(188,166,101, 0.7);
 }
-
+.card a, .card a:visited {
+    color: white;
+    text-decoration: none;
+}
+.card a span {
+    top: 0.20em;
+    left: 0.2em;
+}
 .card label{
     color: white;
 }

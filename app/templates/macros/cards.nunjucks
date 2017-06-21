@@ -15,14 +15,14 @@
 {% endset %}
 
 {% macro getCreatureInput(default, min, max, status) %}
-        <div class="form-group row">
-            <label class="col-6 col-form-label">Status: </label>
-            <select class="custom-select col-6 creature-status">
-                <option value="1" {%  if status == "dies" %} selected {% endif %}>Dies</option>
-                <option value="0" {% if status != "dies" %} selected {% endif %}>Lives</option>
-            </select>
-        </div>
-        {{ createLabeledInput("HP", "creature-hp", min, max, default) }}
+    <div class="form-group row">
+        <label class="col-6 col-form-label">Status: </label>
+        <select class="custom-select col-6 creature-status">
+            <option value="1" {% if status == "dies" %} selected {% endif %}>Dies</option>
+            <option value="0" {% if status != "dies" %} selected {% endif %}>Lives</option>
+        </select>
+    </div>
+    {{ createLabeledInput("HP", "creature-hp", min, max, default) }}
 {% endmacro %}
 
 {% macro getCardInput() %}
@@ -48,14 +48,19 @@
         {% elseif type == "god" %}  creature god card-success
         {% elseif type == "to-draw" %} draw card-info
         {% elseif type == "options" %} card-success
+        {% elseif type == "link" %} card-warning
         {% else %} card-danger
         {% endif %}
         text-center"
          id={{ id }}
-        >
-        <div class="card-block {% if type == "creature" or type == "to-draw" %}pb-0 {% endif %}">
+    >
+        <div class="card-block
+             {% if type == "creature" or type == "to-draw" %}pb-0
+             {% elseif type == "link" %} pb-1 pt-2
+             {% elseif type == "options" %} pb-1
+             {% endif %}">
             <h4 class="card-title lead">
-                {{ title }}
+                {{ title | safe }}
             </h4>
             {% if type == "creature" %}
                 {{ getCreatureInput(2, 1, 20, "dies")| safe }}
@@ -63,7 +68,7 @@
                 {{ getCreatureInput(16, 1, 20, "lives")| safe }}
             {% elseif type == "pings" %}
                 {{ createInputField("ping-amount", 0, 12, 4) }}
-            {%  elseif type == "draws" %}
+            {% elseif type == "draws" %}
                 {{ createInputField("draw-amount", 3, 30, 4) }}
             {% elseif type == "to-draw" %}
                 {{ getCardInput() }}
@@ -75,11 +80,37 @@
         </div>
         {% if type == "creature" or type == "to-draw" %}
             <footer>
-                <button class="btn btn-danger float-right m-1 remove-card-btn"><span class="glyphicon glyphicon-remove"></span></button>
+                <button class="btn btn-danger float-right m-1 remove-card-btn"><span
+                            class="glyphicon glyphicon-remove"></span></button>
             </footer>
         {% endif %}
     </div>
 {% endmacro %}
+
+{% macro createLinkCard(text, linkTo) %}
+    {% set title %}
+        <div class="col-12">
+            <a class="lead"
+               href="{{ linkTo | safe }}">{{ text }}<span class="glyphicon glyphicon-menu-right"></span>
+            </a>
+        </div>
+        <div class="col-12">
+            <a class="lead"
+               href="#">About<span class="glyphicon glyphicon-menu-right"></span>
+            </a>
+        </div>
+    {% endset %}
+    {{ create(title, "link") }}
+{% endmacro %}
+
+{% macro createOptionsCard() %}
+    {{ create("Options", "options", "options-card") }}
+{% endmacro %}
+
+{% macro createDrawsCard() %}
+    {{ create("Draws", "draws", "draw-card") }}
+{% endmacro %}
+
 {% macro createCardButtons(addType) %}
     <button id="add-card-btn" class="btn btn-info btn-block">
         Add {{ addType }} <span id="add-icon" class="glyphicon glyphicon-plus"></span>

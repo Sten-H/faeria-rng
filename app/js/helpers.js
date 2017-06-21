@@ -43,13 +43,14 @@ let uiHelpers = {};
         newCard.slideToggle("fast");
         // Button spin effect
         uiHelpers.spinGlyphicon($(this).find("span"));
+        return newCard;
     };
     this.spinAllGlyphicons = function() {
         $.each($("span.glyphicon"), (index, icon) => uiHelpers.spinGlyphicon($(icon), Math.random() >= 0.5, 1000));
     };
     this.addCardListener = function(base) {
-        uiHelpers.addCard(base);
         uiHelpers.spinGlyphicon($("#add-card-btn").find("span"));
+        return uiHelpers.addCard(base);
     };
     /**
      * Spins a glyphicon for a given duration.
@@ -86,15 +87,10 @@ let uiHelpers = {};
      * @param  {Number} c amount of desired hands
      */
     this.shakeScreen = function(c) {
-        this.rumbleElement("#chance-number", true,c, 1200);
-        if (c >= 0.700) {
-            this.rumbleElement("#title", true, c / 1.5 , 1100);
-        }
-        if(c >= 0.950) {
-            // FIXME rumbling cards bugs on draw page. It's a fun effect, try to fix it.
-            // this.rumbleElement(".card", true, c / 2, 800);
-            this.rumbleElement(".content", false, c / 2, 900);
-        }
+        this.rumbleElement("#chance-number", true, c, 1200);
+        this.rumbleElement("#title", true, c / 4 , 1100);
+        this.rumbleElement(".card", true, c / 2, 800);
+        this.rumbleElement(".content", false, c / 2, 900);
     }
 }).apply(uiHelpers);
 

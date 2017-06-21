@@ -10,7 +10,6 @@ let main = {};
      */
     function resultScreenEffects(c) {
         uiHelpers.shakeScreen(c);
-        uiHelpers.spinAllGlyphicons(c);
     }
     /**
      * Display error text
@@ -55,7 +54,7 @@ let main = {};
         let totalAmount = cardInputs.reduce((acc, input) =>
         acc + Number(input.total), 0);
         // User supposes a larger deck than is possible
-        if(totalAmount > simulation.getDeckSize()) {
+        if(totalAmount > drawSimulation.getDeckSize()) {
             msg.append("Target card ", uiHelpers.highlightWrap("amounts"), " sum exceeds deck size");
             return {val: false, msg: msg };
         }
@@ -76,7 +75,7 @@ let main = {};
         return {val: true, msg: ""};
     }
     /**
-     * Validates user input and runs simulation if input is valid.
+     * Validates user input and runs drawSimulation if input is valid.
      */
     function run() {
         const smartMulligan = $("#mulligan-checkbox").is(':checked'),
@@ -87,10 +86,10 @@ let main = {};
             let timeTaken,
                 c;
             if(smartMulligan) {
-                [timeTaken, c] = helpers.timeFunction(simulation.run, cardInfo, drawAmount);
+                [timeTaken, c] = helpers.timeFunction(drawSimulation.run, cardInfo, drawAmount);
             }
             else {
-                [timeTaken, c] = helpers.timeFunction(chance.calculate, cardInfo, drawAmount);
+                [timeTaken, c] = helpers.timeFunction(draw.calculate, cardInfo, drawAmount);
             }
             timeTaken = (timeTaken / 1000).toFixed(3); // convert to seconds
             // Clean up load time effects
@@ -112,14 +111,14 @@ let main = {};
         // Add button listeners
         $("#add-card-btn").click(() => uiHelpers.addCardListener(base));
         /* This is used because on mouseDown triggers before the form submission, so it will
-           update the DOM before time consuming simulation is called by form submission */
+           update the DOM before time consuming drawSimulation is called by form submission */
         $("#calculate-btn").on("mousedown", () => {
             $("#calculate-btn").addClass("disabled");
             $("#chance-text-number").html("---");
             $("#error-wrapper").hide();
             $("#results-wrapper").show();
             $("#calculate-btn span").addClass(loadIcon);
-            run()
+            run();
         });
         uiHelpers.init();
         $(".draw-amount").val(helpers.getRandomIntInclusive(3, 20));

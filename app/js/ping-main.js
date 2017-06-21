@@ -6,9 +6,10 @@
     /**
      * Changes creature card color depending on desired life status
      */
-    function lifeStatusListener() {
-        const newVal = Number($(this).val()),
-            creatureCard = $(this).closest(".creature");
+    function changeLifeStatus(context) {
+        console.log(context);
+        const newVal = Number($(context).val()),
+            creatureCard = $(context).closest(".card");
         if (newVal) {
             creatureCard.removeClass("card-success");
             if(creatureCard.hasClass("god")) {
@@ -60,6 +61,7 @@
     function calculateListener() {
         const creatures = getCreatureInput(),
             pings = getPingInput(),
+            // [time, c] = helpers.timeFunction(simplePing.calculate, creatures, pings, true);
             [time, c] = helpers.timeFunction(ping.calculate, creatures, pings, true);
         // Update results
         uiHelpers.updateResults(time, c);
@@ -67,8 +69,15 @@
         uiHelpers.shakeScreen(c);
     }
     $(document).ready(() => {
-        $(".creature.god select").change(lifeStatusListener);
-        $("#add-card-btn").click(() => uiHelpers.addCardListener(base));
+        $(".creature.god select").change(function() {
+            changeLifeStatus(this);
+        });
+        $("#add-card-btn").click(() => {
+            let newCreature = uiHelpers.addCardListener(base);
+            newCreature.change(function() {
+                changeLifeStatus($(this).find("select"));
+            });
+        });
         $("#calculate-btn").click(calculateListener);
         uiHelpers.init();
     });

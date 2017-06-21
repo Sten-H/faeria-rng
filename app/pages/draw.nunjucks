@@ -10,27 +10,27 @@
     <div class="col-12">
         <div class="card-columns" id="card-container">
             {# Link card #}
-            {{ cards.createLinkCard("Draws", "index.html") }}
-            <!-- Ping card -->
-            {{ cards.create("Pings", "pings", "ping-card") }}
-            <!-- God card -->
-            {{ cards.create("God", "god") }}
+            {{ cards.createLinkCard("Pings", "ping.html") }}
+            <!-- Draw card -->
+            {{ cards.createDrawsCard() }}
+            <!-- Options card -->
+            {{ cards.createOptionsCard() }}
         </div>
     </div>
     {# BUTTONS #}
     <div class="col-12">
-        {{ cards.createCardButtons("creature") }}
+        {{ cards.createCardButtons("card") }}
     </div>
     <!--  RESULTS -->
     <div class="col-12 my-2">
-        {{ general.createResultsDisplay("games") }}
+        {{ general.createResultsDisplay("hands") }}
     </div>
     <!-- FAQ  -->
     <div class="col-12">
-        {{ general.createFaq(faq.ping, "ping") }}
+        {{ general.createFaq(faq.draw) }}
     </div>
-    {# BASE CREATURE CARD, only used for templating #}
-    {{ cards.create("Creature", "creature", "base") }}
+    {# BASE TO-DRAW CARD, only used for templating #}
+    {{ cards.create("Card", "to-draw", "base") }}
 {% endblock %}
 {% block footer %}
     {% include "partials/footer.nunjucks" %}
@@ -39,5 +39,6 @@
     <script src="js/simulation.js"></script>
     <script src="js/calculation.js"></script>
     <script src="js/helpers.js"></script>
-    <script src="js/ping-main.js"></script>
+    <script src="js/main.js"></script>
 {% endblock %}
+
