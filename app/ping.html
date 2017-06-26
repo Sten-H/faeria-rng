@@ -22,7 +22,7 @@
 <div class="container content rumble">
     <div class="row">
         <div class="col-md-12 offset-lg-2 col-lg-8">
-            <div class="col-12 mt-3">
+            <div class="col-12 mt-0 mt-sm-3">
                 
     
     <div class="col-12">
@@ -42,15 +42,17 @@
              ">
             <h4 class="card-title lead">
                 
-        <div class="col-12">
-            <a class="lead"
-               href="index.html">Draws<span class="glyphicon glyphicon-menu-right"></span>
-            </a>
-        </div>
-        <div class="col-12">
-            <a class="lead"
-               href="#">About<span class="glyphicon glyphicon-menu-right"></span>
-            </a>
+        <div class="row">
+            <div class="col-6 col-sm-12">
+                <a class="lead"
+                   href="draw.html">Draws<span class="glyphicon glyphicon-menu-right"></span>
+                </a>
+            </div>
+            <div class="col-6 col-sm-12">
+                <a class="lead"
+                   href="#">About<span class="glyphicon glyphicon-menu-right"></span>
+                </a>
+            </div>
         </div>
     
             </h4>
@@ -101,15 +103,17 @@
                 
     <div class="form-group row">
         <label class="col-6 col-form-label">Status: </label>
-        <select class="custom-select col-6 creature-status">
-            <option value="1" >Dies</option>
-            <option value="0"  selected >Lives</option>
-        </select>
+        <div class="col-6 px-sm-0">
+            <select class="custom-select creature-status">
+                <option value="1" >Dies</option>
+                <option value="0"  selected >Lives</option>
+            </select>
+        </div>
     </div>
     
     <div class="form-group row">
         <label class="col-6 col-form-label">HP:</label>
-        <div class="col-6 px-0">
+        <div class="col-6 px-sm-0">
             
     <input class="form-control creature-hp" type="number" value=16 min=1 max=20>
 
@@ -130,7 +134,7 @@
     <button id="add-card-btn" class="btn btn-info btn-block">
         Add creature <span id="add-icon" class="glyphicon glyphicon-plus"></span>
     </button>
-    <button id="calculate-btn" class="btn btn-primary btn-block">
+    <button id="calculate-btn" class="btn btn-primary btn-block mt-3 mt-sm-2">
         Calculate <span class="glyphicon glyphicon-spin"></span>
     </button>
 
@@ -193,14 +197,8 @@
                     <p class="question">Can a target be damaged beyond its hp?</p>
                     <p class="answer">No once it has received a ping that brings its hp to 0 it is no longer considered a target for remaining pings. So if you have 4 pings and 2 creatures with 2 hp, they will both die in all outcomes.</p>
                 
-                    <p class="question">Is this working properly?</p>
-                    <p class="answer">Not right now, pings can hit creatures that have died. It still generates correct results if there is one creature set to live with hp > ping amounts. This is because then every overdamage ping can be counted as a ping on that creature, and we don't care about that creature's life status in that situation. This is of course not intended behaviour and should be fixed.</p>
-                
                     <p class="question">Why is performance so bad with high ping amounts and many creatures?</p>
-                    <p class="answer">If creature amount is <em>n</em> and ping amount is <em>k</em> the complexity is O(n<sup>k</sup>n). n<sup>k</sup> are the number of outcomes. Each creature marked to die then filters the outcomes for only outcomes where it dies. If there are 5 creatures (2 set to die) and 9 pings that's 5<sup>9</sup>2 = 3 906 250 . Pretty bad, huh? Making complexity <em>just</em> n<sup>k</sup> should be pretty easy.</p></p>
-                
-                    <p class="question">This sounds really simple...</p>
-                    <p class="answer">That's not a question and also thanks for making me feel bad <strong>:(</strong></p>
+                    <p class="answer">If creature amount is <em>n</em> and ping amount is <em>k</em> the complexity is O(n<sup>k</sup>n). n<sup>k</sup> are the number of outcomes. Each creature then filters the outcomes for only outcomes where its desired status (dead/alive) matches.</p></p>
                 
             </div>
         </div>
@@ -225,15 +223,17 @@
                 
     <div class="form-group row">
         <label class="col-6 col-form-label">Status: </label>
-        <select class="custom-select col-6 creature-status">
-            <option value="1"  selected >Dies</option>
-            <option value="0" >Lives</option>
-        </select>
+        <div class="col-6 px-sm-0">
+            <select class="custom-select creature-status">
+                <option value="1"  selected >Dies</option>
+                <option value="0" >Lives</option>
+            </select>
+        </div>
     </div>
     
     <div class="form-group row">
         <label class="col-6 col-form-label">HP:</label>
-        <div class="col-6 px-0">
+        <div class="col-6 px-sm-0">
             
     <input class="form-control creature-hp" type="number" value=2 min=1 max=20>
 
@@ -271,7 +271,7 @@
             </div>
             <!--  Github link -->
             <div class="col-12 offset-xl-1 col-xl-2">
-                <a href="https://github.com/Sten-H/Sten-H.github.io" target="_blank">
+                <a href="https://github.com/Sten-H/faeria-rng" target="_blank">
                     View on Github
                     <img src="images/Octocat.png" width=40 alt="Github logo">
                 </a>

@@ -17,10 +17,12 @@
 {% macro getCreatureInput(default, min, max, status) %}
     <div class="form-group row">
         <label class="col-6 col-form-label">Status: </label>
-        <select class="custom-select col-6 creature-status">
-            <option value="1" {% if status == "dies" %} selected {% endif %}>Dies</option>
-            <option value="0" {% if status != "dies" %} selected {% endif %}>Lives</option>
-        </select>
+        <div class="col-6 px-sm-0">
+            <select class="custom-select creature-status">
+                <option value="1" {% if status == "dies" %} selected {% endif %}>Dies</option>
+                <option value="0" {% if status != "dies" %} selected {% endif %}>Lives</option>
+            </select>
+        </div>
     </div>
     {{ createLabeledInput("HP", "creature-hp", min, max, default) }}
 {% endmacro %}
@@ -36,7 +38,7 @@
 {% macro createLabeledInput(label, classes, min, max, default) %}
     <div class="form-group row">
         <label class="col-6 col-form-label">{{ label }}:</label>
-        <div class="col-6 px-0">
+        <div class="col-6 px-sm-0">
             {{ createInputField(classes, min, max, default) }}
         </div>
     </div>
@@ -89,15 +91,17 @@
 
 {% macro createLinkCard(text, linkTo) %}
     {% set title %}
-        <div class="col-12">
-            <a class="lead"
-               href="{{ linkTo | safe }}">{{ text }}<span class="glyphicon glyphicon-menu-right"></span>
-            </a>
-        </div>
-        <div class="col-12">
-            <a class="lead"
-               href="#">About<span class="glyphicon glyphicon-menu-right"></span>
-            </a>
+        <div class="row">
+            <div class="col-6 col-sm-12">
+                <a class="lead"
+                   href="{{ linkTo | safe }}">{{ text }}<span class="glyphicon glyphicon-menu-right"></span>
+                </a>
+            </div>
+            <div class="col-6 col-sm-12">
+                <a class="lead"
+                   href="#">About<span class="glyphicon glyphicon-menu-right"></span>
+                </a>
+            </div>
         </div>
     {% endset %}
     {{ create(title, "link") }}
@@ -115,7 +119,7 @@
     <button id="add-card-btn" class="btn btn-info btn-block">
         Add {{ addType }} <span id="add-icon" class="glyphicon glyphicon-plus"></span>
     </button>
-    <button id="calculate-btn" class="btn btn-primary btn-block">
+    <button id="calculate-btn" class="btn btn-primary btn-block mt-3 mt-sm-2">
         Calculate <span class="glyphicon glyphicon-spin"></span>
     </button>
 {% endmacro %}

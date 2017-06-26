@@ -10,7 +10,7 @@
     <div class="col-12">
         <div class="card-columns" id="card-container">
             {# Link card #}
-            {{ cards.createLinkCard("Draws", "index.html") }}
+            {{ cards.createLinkCard("Draws", "draw.html") }}
             <!-- Ping card -->
             {{ cards.create("Pings", "pings", "ping-card") }}
             <!-- God card -->

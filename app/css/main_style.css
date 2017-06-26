@@ -17,7 +17,8 @@ html {
 }
 
 body {
-    margin-bottom: 40px;
+    /* Footer area */
+    margin-bottom: 2.5em;
 }
 .text-highlight {
     color: #BCA665;
@@ -30,6 +31,7 @@ header {
 hr {
     border-color: rgba(188,166,101, 0.7);
 }
+/* Card related styling */
 .card a, .card a:visited {
     color: white;
     text-decoration: none;
@@ -47,22 +49,27 @@ hr {
 .card-title {
     font-size: 1.5em;
 }
-
 .creature .to-die.glyphicon-ok {
     color: greenyellow;
 }
 .creature .to-die.glyphicon-remove {
     color: indianred;
 }
+.creature-status {
+    min-width: 100%;
+}
 /* Card columns amount at different resolutions */
 @media (max-width: 575px) {
+    html {
+        font-size: 11px;
+    }
     .card-columns {
         column-count: 1;
     }
-    .card.creature {
+    .card {
         margin-top: 1em;
     }
-    #add-creature-btn {
+    #add-card-btn {
         margin-top: 1em;
     }
 }
@@ -78,7 +85,7 @@ hr {
         column-count: 3;
     }
 }
-
+/* End card related styling */
 #error-wrapper {
     display: none;
 }

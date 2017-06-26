@@ -84,13 +84,19 @@ let uiHelpers = {};
     };
     /**
      * Shakes screen and some specific elements based on c
-     * @param  {Number} c amount of desired hands
+     * @param  {Number} c chance of reaching desired outcome (probability)
      */
     this.shakeScreen = function(c) {
-        this.rumbleElement("#chance-number", true, c, 1200);
-        this.rumbleElement("#title", true, c / 4 , 1100);
-        this.rumbleElement(".card", true, c / 2, 800);
-        this.rumbleElement(".content", false, c / 2, 900);
+        /* The c value is floored because when it is too small, the rumbles will move the elements by subpixels and
+         it creates a jagged effect */
+        let floorVal = 0.009,
+            flooredC = Math.max(floorVal, c);
+        this.rumbleElement("#chance-number", true, flooredC, 1200);
+        if(flooredC > floorVal) {  // If c value was not floored rumble all elements
+            this.rumbleElement("#title", true, flooredC / 4 , 1100);
+            this.rumbleElement(".card", true, flooredC / 2, 800);
+            this.rumbleElement(".content", false, flooredC / 2, 900);
+        }
     }
 }).apply(uiHelpers);
 
@@ -107,7 +113,7 @@ let helpers = {};
         let t0 = performance.now(),
             returnValue = func(...args);
         return [performance.now() - t0, returnValue];
-    }
+    };
     this.range = function(start, end) {
         return [...new Array(end - start).keys()].map((val) => val + start);
     };
@@ -120,8 +126,6 @@ let helpers = {};
         return Math.floor(Math.random() * (max - min)) + min;
     };
     this.getRandomIntInclusive = function (min, max) {
-        min = Math.ceil(min);
-        max = Math.floor(max);
-        return Math.floor(Math.random() * (max - min + 1)) + min;
+        return this.getRandomInt(min, max + 1);
     };
 }).apply(helpers);

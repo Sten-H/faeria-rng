@@ -1,8 +1,9 @@
 let main = {};
-(function() {
+(function () {
     "use strict";
     let loadIcon = "glyphicon-repeat",
-        base = $("#base");;
+        base = $("#base");
+    ;
     /**
      * Creates effects on screen based on the amount of bad luck player
      * has painfully endured. A high c will create larger effects.
@@ -11,6 +12,7 @@ let main = {};
     function resultScreenEffects(c) {
         uiHelpers.shakeScreen(c);
     }
+
     /**
      * Display error text
      */
@@ -19,6 +21,7 @@ let main = {};
         $("#error-wrapper").show();
         $("#results-wrapper").hide();
     }
+
     /**
      * Removes effects shown while loading
      */
@@ -26,6 +29,7 @@ let main = {};
         $("#calculate-btn span").removeClass(loadIcon);
         $("#calculate-btn").removeClass("disabled");
     }
+
     /**
      * Collects user card related input and represents each card as an object with
      * needed, amount, value, foundAmount variables. Card objects are returned in an array.
@@ -34,14 +38,15 @@ let main = {};
     function getCardInput() {
         return [...$(".draw").not("#base") // The spread is used to get rid of jquery object
             .map((index, input) => {
-            return {
-                needed: Number($(input).find(".card-need").val()),
-                total: Number($(input).find(".card-deck").val()),
-                value: index,
-                foundtotal: 0  // FIXME Don't think I need this check.
-            }
-        })];
+                return {
+                    needed: Number($(input).find(".card-need").val()),
+                    total: Number($(input).find(".card-deck").val()),
+                    value: index,
+                    foundtotal: 0  // FIXME Don't think I need this check.
+                }
+            })];
     }
+
     /**
      * Checks all user entered input. Returns an object containing validity and optionally
      * a message to explain what is not valid.
@@ -54,9 +59,9 @@ let main = {};
         let totalAmount = cardInputs.reduce((acc, input) =>
         acc + Number(input.total), 0);
         // User supposes a larger deck than is possible
-        if(totalAmount > drawSimulation.getDeckSize()) {
+        if (totalAmount > drawSimulation.getDeckSize()) {
             msg.append("Target card ", uiHelpers.highlightWrap("amounts"), " sum exceeds deck size");
-            return {val: false, msg: msg };
+            return {val: false, msg: msg};
         }
         let totalNeeded = cardInputs.reduce((acc, input) =>
         acc + Number(input.needed), 0);
@@ -74,6 +79,7 @@ let main = {};
         }
         return {val: true, msg: ""};
     }
+
     /**
      * Validates user input and runs drawSimulation if input is valid.
      */
@@ -82,10 +88,10 @@ let main = {};
             drawAmount = Number($(".draw-amount").val()),
             cardInfo = getCardInput(),
             validity = isInputValid(drawAmount, cardInfo);
-        if(validity.val) {
+        if (validity.val) {
             let timeTaken,
                 c;
-            if(smartMulligan) {
+            if (smartMulligan) {
                 [timeTaken, c] = helpers.timeFunction(drawSimulation.run, cardInfo, drawAmount);
             }
             else {
@@ -105,13 +111,12 @@ let main = {};
         // Collapse FAQ in case it was open. Would be nice to do this before calculation but it becomes very choppy.
         $("#faq-wrapper").collapse('hide');
     }
-    $(document).ready(function() {
+
+    $(document).ready(function () {
         // Add initial target card input
         uiHelpers.addCard(base);
         // Add button listeners
         $("#add-card-btn").click(() => uiHelpers.addCardListener(base));
-        /* This is used because on mouseDown triggers before the form submission, so it will
-           update the DOM before time consuming drawSimulation is called by form submission */
         $("#calculate-btn").on("mousedown", () => {
             $("#calculate-btn").addClass("disabled");
             $("#chance-text-number").html("---");

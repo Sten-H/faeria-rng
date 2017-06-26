@@ -1,6 +1,6 @@
-(function() {
+(function () {
     "use strict";
-    // Template for creature cards
+    // Template for creating creature cards
     const base = $("#base");
 
     /**
@@ -12,7 +12,7 @@
             creatureCard = $(context).closest(".card");
         if (newVal) {
             creatureCard.removeClass("card-success");
-            if(creatureCard.hasClass("god")) {
+            if (creatureCard.hasClass("god")) {
                 creatureCard.addClass("card-primary");
             }
             else {
@@ -20,7 +20,7 @@
             }
         }
         else {
-            if(creatureCard.hasClass("god")) {
+            if (creatureCard.hasClass("god")) {
                 creatureCard.removeClass("card-primary");
             }
             else {
@@ -37,10 +37,11 @@
     function getCreatureInput() {
         return [...$(".card.creature").not("#base")  // The spread is used to get rid of jquery object
             .map((index, card) => {
-            const toDie = Number($(card).find("select").val()) === 1,
-                hp = Number($(card).find("input.creature-hp").val());
-            return {toDie: toDie, hp: hp, activeHp: 0, name: index + 1};
-        })];
+                const toDie = Number($(card).find("select").val()) === 1,
+                    hp = Number($(card).find("input.creature-hp").val());
+                // return new Creature(hp, index, toDie);
+                return {toDie: toDie, hp: hp, activeHp: 0, name: index };
+            })];
     }
 
     /**
@@ -68,13 +69,14 @@
         // Screen effects
         uiHelpers.shakeScreen(c);
     }
+
     $(document).ready(() => {
-        $(".creature.god select").change(function() {
+        $(".creature.god select").change(function () {
             changeLifeStatus(this);
         });
         $("#add-card-btn").click(() => {
             let newCreature = uiHelpers.addCardListener(base);
-            newCreature.change(function() {
+            newCreature.change(function () {
                 changeLifeStatus($(this).find("select"));
             });
         });

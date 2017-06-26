@@ -11,7 +11,7 @@
             </div>
             <!--  Github link -->
             <div class="col-12 offset-xl-1 col-xl-2">
-                <a href="https://github.com/Sten-H/Sten-H.github.io" target="_blank">
+                <a href="https://github.com/Sten-H/faeria-rng" target="_blank">
                     View on Github
                     <img src="images/Octocat.png" width=40 alt="Github logo">
                 </a>
