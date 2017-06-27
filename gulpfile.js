@@ -1,6 +1,5 @@
 // Gulp.js configuration
-var
-  // modules
+const
   gulp = require('gulp'),
   nunjucksRender = require('gulp-nunjucks-render'),
   data = require('gulp-data'),
