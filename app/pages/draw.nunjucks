@@ -6,6 +6,7 @@
     {% include 'partials/title.nunjucks' %}
 {% endblock %}
 {% block content %}
+    <div id="location" data-location="draw"></div>
     {# CARD AREA #}
     <div class="col-12">
         <div class="card-columns" id="card-container">
@@ -36,9 +37,6 @@
     {% include "partials/footer.nunjucks" %}
 {% endblock %}
 {% block scripts %}
-    <script src="js/simulation.js"></script>
-    <script src="js/calculation.js"></script>
-    <script src="js/helpers.js"></script>
-    <script src="js/main.js"></script>
+    <script src="js/bundle.js"></script>
 {% endblock %}
 

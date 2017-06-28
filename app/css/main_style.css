@@ -10,7 +10,6 @@ html, body {
     background: linear-gradient(#021D24, #023E4F);
     /* Standard syntax */
 }
-
 html {
     position: relative;
     min-height: 100%;

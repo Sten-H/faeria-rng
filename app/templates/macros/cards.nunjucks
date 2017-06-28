@@ -120,6 +120,6 @@
         Add {{ addType }} <span id="add-icon" class="glyphicon glyphicon-plus"></span>
     </button>
     <button id="calculate-btn" class="btn btn-primary btn-block mt-3 mt-sm-2">
-        Calculate <span class="glyphicon glyphicon-spin"></span>
+        Calculate <span class="glyphicon glyphicon-spin glyphicon-repeat"></span>
     </button>
 {% endmacro %}

@@ -1,0 +1,22 @@
+{
+    "files": [
+//        "app/js/ping-calculation.ts",
+        "app/js/main.ts"
+    ],
+    "include": [
+//        "app/js/lib/*"
+//        "app/js/*"
+    ],
+//    "exclude": [
+//        "node_modules",
+//        "app/js/lib",
+//        "**/*.spec.ts"
+//    ],
+    "compilerOptions": {
+        "noImplicitAny": true,
+//        "noImplicitAny": false,
+        "typeRoots" : ["node_modules/@types"],
+        "target": "es5",
+        "lib": ["dom", "es2015.promise", "es2015"]
+    }
+}
