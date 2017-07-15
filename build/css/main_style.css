@@ -1,0 +1,200 @@
+html, body {
+    color: white;
+    background: #023E4F;
+    background: -webkit-linear-gradient(#021D24, #023E4F);
+    /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(#021D24, #023E4F);
+    /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(#021D24, #023E4F);
+    /* For Firefox 3.6 to 15 */
+    background: linear-gradient(#021D24, #023E4F);
+    /* Standard syntax */
+}
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    /* Footer area */
+    margin-bottom: 2.5em;
+}
+.text-highlight {
+    color: #BCA665;
+}
+
+header {
+    text-align: center;
+}
+
+hr {
+    border-color: rgba(188,166,101, 0.7);
+}
+/* Card related styling */
+.card a, .card a:visited {
+    color: white;
+    text-decoration: none;
+}
+.card a span {
+    top: 0.20em;
+    left: 0.2em;
+}
+.card label{
+    color: white;
+}
+#base {
+    display: none;
+}
+.card-title {
+    font-size: 1.5em;
+}
+.creature .to-die.glyphicon-ok {
+    color: greenyellow;
+}
+.creature .to-die.glyphicon-remove {
+    color: indianred;
+}
+.creature-status {
+    min-width: 100%;
+}
+/* Card columns amount at different resolutions */
+@media (max-width: 575px) {
+    html {
+        font-size: 11px;
+    }
+    .card-columns {
+        column-count: 1;
+    }
+    .card {
+        margin-top: 1em;
+    }
+    #add-card-btn {
+        margin-top: 1em;
+    }
+}
+
+@media (min-width: 576px) {
+    .card-columns {
+        column-count: 2;
+    }
+}
+
+@media (min-width: 768px) {
+    .card-columns {
+        column-count: 3;
+    }
+}
+/* End card related styling */
+#error-wrapper {
+    display: none;
+}
+.footer {
+  text-align: center;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 40px;
+}
+
+.help-tooltip {
+  font-size: 1.2em;
+  font-weight: bold;
+    cursor: pointer;
+}
+
+/* FAQ related styling */
+.question:before {
+    content: "Q: ";
+}
+
+.question {
+    font-style: italic;
+    margin-bottom: 0;
+}
+
+.answer {
+    font-size: 0.9em;
+    margin-top: 0;
+    color: #BCA665;
+    text-indent: 2em;
+}
+/* End FAQ styling */
+.transparent-bg {
+  background-color: rgba(2, 45, 57, 0.2);
+}
+
+a, a:hover, a:visited {
+  color: #BCA665;
+  text-decoration: underline;
+}
+/* Collapsible card styling */
+.card-header a {
+  display: block;
+  color: #BCA665;
+  text-decoration: none;
+}
+.card-header a:after {
+    /* symbol for "opening" panels */
+    font-family: 'Glyphicons Halflings';  /* essential for enabling glyphicon */
+    content: "\e114";    /* adjust as needed, taken from bootstrap.css */
+    float: right;        /* adjust as needed */
+}
+
+.card-header a.collapsed:after {
+    /* symbol for "collapsed" panels */
+    content: "\e080";    /* adjust as needed, taken from bootstrap.css */
+}
+/* End collapsible card styling */
+/* CSS for spinning glyphicons */
+.glyphicon-spin {
+    -webkit-animation: spin 1000ms infinite linear;
+    animation: spin 1000ms infinite linear;
+}
+@-webkit-keyframes spin {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(359deg);
+        transform: rotate(359deg);
+    }
+}
+
+@keyframes spin {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(359deg);
+        transform: rotate(359deg);
+    }
+}
+
+.glyphicon-rev-spin {
+    -webkit-animation: rev-spin 1000ms infinite linear;
+    animation: rev-spin 1000ms infinite linear;
+}
+
+@-webkit-keyframes rev-spin {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(-359deg);
+        transform: rotate(-359deg);
+    }
+}
+
+@keyframes rev-spin {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(-359deg);
+        transform: rotate(-359deg);
+    }
+}
