@@ -38,6 +38,10 @@ gulp.task('libs', function(){
 
 // Just copies css folder to build at the moment. Can later transpile from less/sass/whatever
 gulp.task('css', function() {
+    gulp.src(['node_modules/bootstrap/**/*.css'])
+        .pipe(gulp.dest(dirs.build + 'css/bootstrap/'));
+    gulp.src(['node_modules/tether/**/*.css'])
+        .pipe(gulp.dest(dirs.build + 'css/tether/'));
     return gulp.src([dirs.src + 'css/**/*'])
         .pipe(gulp.dest(dirs.build + 'css'));
 });

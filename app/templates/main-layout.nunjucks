@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="css/glyphicon-halflings/css/glyphicons.css">
-    <link rel="stylesheet" type="text/css" href="../node_modules/tether/dist/css/tether.css">
-    <link rel="stylesheet" type="text/css" href="../node_modules/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="css/tether/dist/css/tether.css">
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/dist/css/bootstrap.css">
     <link rel="stylesheet" type="text/css" href="css/main_style.css">
 </head>
 <body>
