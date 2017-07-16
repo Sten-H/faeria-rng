@@ -36,7 +36,6 @@ gulp.task('libs', function(){
         .pipe(gulp.dest(dirs.build + 'js/lib'));
 });
 
-// Just copies css folder to build at the moment. Can later transpile from less/sass/whatever
 gulp.task('css', function() {
     gulp.src(['node_modules/bootstrap/**/*.css'])
         .pipe(gulp.dest(dirs.build + 'css/bootstrap/'));

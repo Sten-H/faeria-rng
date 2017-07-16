@@ -128,13 +128,9 @@ namespace Simulation {
      * @return {Array}          Returns array representing the populated deck.
      */
     function createDeck(targetCards: Array<CardInfo>): Array<number> {
-        let deck: Array<number> = Array(30).fill(-1),
-            currIndex: number = 0;
-        targetCards.forEach((card) => {
-            deck.fill(card.value, currIndex, currIndex + card.total);
-            currIndex += card.total;
-        });
-        return deck;
+        const targets = targetCards.map(card => Array<number>(card.total).fill(card.value)),
+            nonTargets = Array(30).fill(-1);
+        return [].concat(...targets, nonTargets).slice(0, 30);
     }
     /**
      * Checks if deck contains card in the needed amount.
@@ -146,7 +142,8 @@ namespace Simulation {
         if (card.needed <= 0) {
             return true;
         }
-        return deck.reduce((acc, cardVal) => (cardVal === card.value) ? acc + 1 : acc, 0) >= card.needed;
+        return deck.reduce((acc, cardVal) =>
+                (cardVal === card.value) ? acc + 1 : acc, 0) >= card.needed;
     }
 
     /**
@@ -199,8 +196,6 @@ namespace Simulation {
             activeDeck.push(-1);
             swap(activeDeck, activeDeck.length -1, helpers.getRandomIntInclusive(0, activeDeck.length));
         }
-        // Draw up to three cards again
-        activeHand = activeHand.concat(activeDeck.slice(0, mulliganCount));
         // Remove drawn cards from deck
         activeDeck = activeDeck.slice(mulliganCount);
         return [activeHand, activeDeck];
@@ -248,7 +243,7 @@ namespace Simulation {
      * @return {number}                   Returns the ratio of desired hands to all hands
      */
     export function run(targetCards: Array<CardInfo>, drawAmount: number): number {
-        let deck: Array<number> = createDeck(targetCards);
+        const deck: Array<number> = createDeck(targetCards);
         return simulate(deck, targetCards, drawAmount);
     }
 }

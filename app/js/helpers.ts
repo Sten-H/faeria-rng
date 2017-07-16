@@ -1,14 +1,8 @@
 "use strict";
 import * as $ from "jquery";
 import "jrumble";
-/// <reference path="node_modules/@types/jquery.index.d.ts" />
-declare global {
-    interface JQuery {
-        jrumble(arg?: object): JQuery;
-        html(obj:JQuery): JQuery;  // Allow html input with JQuery objects
-    }
-}
-export function init() { // FIXME rename to initUI
+
+export function init(): void { // FIXME rename to initUI
     // Initialize rumble effect on elements
     $(".rumble").jrumble(); // FIXME
     // This sets the collapse arrow the right way at start for collapsible cards
@@ -26,13 +20,13 @@ export function updateResults(time: string, c: number, decimals: number = 0) {
  * @param string
  * @returns {jQuery}
  */
-export function highlightWrap(string: string) {
+export function highlightWrap(string: string): JQuery<HTMLElement> {
     return $("<span>").addClass("text-highlight").html(string);
 }
 /**
  * Listener for card delete button
  */
-export function removeCard() {
+export function removeCard(): void {
     const card = $(this).closest(".card");
     card.slideToggle("fast", function() {
         card.remove();
@@ -42,7 +36,7 @@ export function removeCard() {
 /**
  * Add a new card to be considered for probability.
  */
-export function addCard(base: JQuery<HTMLElement>) {
+export function addCard(base: JQuery<HTMLElement>): JQuery<HTMLElement> {
     let newCard = base.clone();
     newCard.removeAttr('id');
     newCard.find(".remove-card-btn").click(removeCard);
@@ -53,22 +47,19 @@ export function addCard(base: JQuery<HTMLElement>) {
     spinGlyphicon($(this).find("span"));
     return newCard;
 }
-export function spinAllGlyphicons() {
-    $.each($("span.glyphicon"), (index, icon) => spinGlyphicon($(icon), Math.random() >= 0.5, 1000));
-}
 /**
  * Spins a glyphicon for a given duration.
  * @param span {Object} jquery object pointing to span with glyphicon class
  * @param reverse {Boolean} reverse spin direction if true
  * @param duration {Number} spin duration in milliseconds
  */
-export function spinGlyphicon(span: JQuery<HTMLElement>, reverse=false, duration=200) {
+export function spinGlyphicon(span: JQuery<HTMLElement>, reverse=false, duration=200): void {
     let spinClass = (reverse) ? "glyphicon-rev-spin" : "glyphicon-spin";
     span.addClass(spinClass);
     setTimeout(() => span.removeClass(spinClass), duration);
 }
 
-export function addCardListener(base: JQuery<HTMLElement>) {
+export function addCardListener(base: JQuery<HTMLElement>): JQuery<HTMLElement> {
     spinGlyphicon($("#add-card-btn").find("span"));
     return addCard(base);
 }
@@ -79,7 +70,7 @@ export function addCardListener(base: JQuery<HTMLElement>) {
  * @param  {int} strength the magnitude of the shakes
  * @param  {int} duration time in milliseconds before shake is stopped
  */
-export function rumbleElement(selector: string, rotate: boolean, strength: number, duration: number) {
+export function rumbleElement(selector: string, rotate: boolean, strength: number, duration: number): void {
     let rumble = {
         x: 10 * strength,
         y: 10 * strength,

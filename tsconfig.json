@@ -1,17 +1,9 @@
 {
     "files": [
-//        "app/js/ping-calculation.ts",
         "app/js/main.ts"
     ],
     "include": [
-//        "app/js/lib/*"
-//        "app/js/*"
     ],
-//    "exclude": [
-//        "node_modules",
-//        "app/js/lib",
-//        "**/*.spec.ts"
-//    ],
     "compilerOptions": {
         "noImplicitAny": true,
 //        "noImplicitAny": false,

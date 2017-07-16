@@ -5,6 +5,7 @@ export type CreatureInfo = {toDie: boolean, hp: number, name: number};
 export namespace Ping {
     // Creature is represented by an array the length of its hp where each entry is its name
     type Creature = Array<number>;
+    // Each entry in val array is 'name' of creature hit
     type Outcome =  {val: Array<number>, p: number}
     /**
      * A node class used for probability tree
@@ -30,11 +31,8 @@ export namespace Ping {
             this.children.push(node);
         }
 
-        /**
-         * Recursively collects all leaf nodes under node in tree
-         * @param leafNodes
-         * @returns {Array<Node>}
-         */
+
+        // Recursively collects all leaf nodes under node in tree
         _getLeafNodes(leafNodes: Array<Node> = []): Array<Node> {
             if (this.children.length <= 0) {
                 leafNodes.push(this);
@@ -46,21 +44,20 @@ export namespace Ping {
         get leafNodes(): Array<Node> {
             return this._getLeafNodes();
         }
+        // Recursively travels up the tree from node creating an Outcome object
+        _getOutcome(outcome: Array<number> = [], p: number=1): Outcome {
+            if(this.parent === null) {
+                return {val: outcome, p: p}
+            } else {
+                return this.parent._getOutcome(outcome.concat(this.value), p * this.probability);
+            }
+        }
         /**
-         * Returns an object with the array represented creatures hit in this outcome, and probability of reaching
-         * this outcome
+         * Returns an Outcome representing creatures hit and probability of reaching this outcome
          * @returns {Outcome}
          */
-        get outcomeWithProbability(): Outcome {
-            let p: number = 1,
-                outcome: Array<number> = [],
-                active: Node = this;
-            while (active.parent !== null) {
-                outcome.push(active.value);
-                p *= active.probability;
-                active = active.parent;
-            }
-            return {val: outcome, p: p};
+        get outcome(): Outcome {
+            return this._getOutcome();
         }
     }
 
@@ -78,7 +75,7 @@ export namespace Ping {
         }
         creatures.map((_, index) => {
             const probability: number = 1 / creatures.length,
-                updatedCreatures: Array<Creature> = helpers.copy(creatures),  // for some reason this needs to be deep copied? Ah array of arrays
+                updatedCreatures: Array<Creature> = helpers.copy(creatures),
                 childNode: Node = new Node(parentNode, helpers.nestedPop(updatedCreatures, index), probability);
             parentNode.addChild(childNode);
             createOutcomeTree(updatedCreatures, pings - 1, childNode);
@@ -108,29 +105,18 @@ export namespace Ping {
      * @returns {Array<Outcome>}
      */
     function filterOutcomes(creatures: Array<CreatureInfo>, outcomes: Array<Outcome>): Array<Outcome> {
-        if (creatures.length === 0)
-            return outcomes;
-        const [creature, ...remaining] = creatures,
-            filtered = outcomes.filter((outcome) => isDesiredOutcome(creature, outcome));
-        return filterOutcomes(remaining, filtered);
-    }
-    /**
-     * Creates an array with nested arrays. The nested arrays are filled with creature.name entered as many times as it
-     * has hp. When a creature takes damage one instance of creature.name is popped from its array to the outcome.
-     * @param creatures {Array<CreatureInfo>}
-     * @returns {Array<Array<int>>}
-     */
-    function getCreatureArray(creatures: Array<CreatureInfo>): Array<Creature> {
-        return creatures.map((c) => {
-            return Array(c.hp).fill(c.name);
-        });
+        return creatures.reduce((acc, c) =>
+            acc.filter(outcome =>
+                isDesiredOutcome(c, outcome)),
+            outcomes);
     }
     export function calculate(creatureInput: Array<CreatureInfo>, pings: number) {
-        const creatures: Array<Creature> = getCreatureArray(creatureInput),
+        // Each Creature is represented as an array with length = hp and filled with its name on each entry
+        const creatures: Array<Creature> = creatureInput.map(c => Array(c.hp).fill(c.name)),
             root: Node = new Node(null, null, 1.0);
         createOutcomeTree(creatures, pings, root);
         const leafNodes: Array<Node> = root.leafNodes,
-            outcomes: Array<Outcome> = leafNodes.map((leaf) => leaf.outcomeWithProbability),
+            outcomes: Array<Outcome> = leafNodes.map((leaf) => leaf.outcome),
             filteredOutcomes: Array<Outcome> = filterOutcomes(creatureInput, outcomes),
             summedProbability: number = filteredOutcomes.reduce((acc, outcome) => acc + outcome.p, 0);
         return summedProbability;
