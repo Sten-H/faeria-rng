@@ -1,87 +1,56 @@
 "use strict";
-import * as helpers from './helpers';
 
 export type CreatureInfo = {toDie: boolean, hp: number, name: number};
 export namespace Ping {
     // Creature is represented by an array the length of its hp where each entry is its name
-    type Creature = Array<number>;
-    // Each entry in val array is 'name' of creature hit
-    type Outcome =  {val: Array<number>, p: number}
-    /**
-     * A node class used for probability tree
-     */
-    class Node {
-        parent: Node;
-        children: Array<Node>;
-        value: number;
-        probability: number;
-        /**
-         * @param parent {Node} parent node
-         * @param value {number} creature hit (represented by integer, each creature has unique int)
-         * @param probability {number} edge probability
-         */
-        constructor(parent: Node, value: number, probability: number) {
-            this.parent = parent;
-            this.children = [];
-            this.value = value;
-            this.probability = probability;
-        }
+    type Creature = ReadonlyArray<number>;
+    // Each entry in val array is 'name' of creature target
+    type Outcome =  {val: ReadonlyArray<number>, p: number}
+    // Node is a node in probability tree
+    type Node = {p: number, target: number, children: ReadonlyArray<Node>}
 
-        addChild(node: Node) {
-            this.children.push(node);
+    function _createOutcomeTree(creatures: ReadonlyArray<Creature>, pings: number): Array<Node> {
+        if (pings <= 0 || creatures.length <= 0) {
+            return [];
         }
-
-
-        // Recursively collects all leaf nodes under node in tree
-        _getLeafNodes(leafNodes: Array<Node> = []): Array<Node> {
-            if (this.children.length <= 0) {
-                leafNodes.push(this);
-            }
-            this.children.map((child) => child._getLeafNodes(leafNodes));
-            return leafNodes;
-        }
-
-        get leafNodes(): Array<Node> {
-            return this._getLeafNodes();
-        }
-        // Recursively travels up the tree from node creating an Outcome object
-        _getOutcome(outcome: Array<number> = [], p: number=1): Outcome {
-            if(this.parent === null) {
-                return {val: outcome, p: p}
-            } else {
-                return this.parent._getOutcome(outcome.concat(this.value), p * this.probability);
-            }
-        }
-        /**
-         * Returns an Outcome representing creatures hit and probability of reaching this outcome
-         * @returns {Outcome}
-         */
-        get outcome(): Outcome {
-            return this._getOutcome();
-        }
+        return creatures.map((targetCreature, index) => {
+            const probability = 1 / creatures.length,
+                targetName: number = targetCreature[0],
+                creaturesAfterPing = creatures
+                    .map((creature, i) => (i === index) ? creature.slice(0, creature.length - 1) : creature)
+                    .filter(creature => creature.length !== 0);  // Filter out tree root value (-1) from outcomes
+            return {p: probability, target: targetName, children: _createOutcomeTree(creaturesAfterPing, pings - 1)}
+        });
     }
-
     /**
-     * Creates a tree built with Node objects. Each node has a probability value, to get the probability to arrive at
+     * Creates a probability tree. Each node has a probability value, to get the probability to arrive at
      * a node you multiply all probabilities from that node up to the root node. The outcome can be found in the same
-     * way by traveling to the root while collecting all Node.value
-     * @param creatures {Array<Creature>}
+     * way by traveling to the root while collecting all target values
+     * @param creatures {ReadonlyArray<Creature>}
      * @param pings {number}
      * @param parentNode {Node}
+     * @return {Node} returns the root node of the tree
      */
-    function createOutcomeTree(creatures: Array<Creature>, pings: number, parentNode: Node): void {
-        if (pings <= 0 || creatures.length <= 0) {
-            return;
-        }
-        creatures.map((_, index) => {
-            const probability: number = 1 / creatures.length,
-                updatedCreatures: Array<Creature> = helpers.copy(creatures),
-                childNode: Node = new Node(parentNode, helpers.nestedPop(updatedCreatures, index), probability);
-            parentNode.addChild(childNode);
-            createOutcomeTree(updatedCreatures, pings - 1, childNode);
-        })
+    function createOutcomeTree(creatures: ReadonlyArray<Creature>, pings: number): Node {
+        return {target: -1, p: 1, children: _createOutcomeTree(creatures, pings)};
     }
 
+    /**
+     * Traverses tree down to leaf nodes and collects all outcomes and returns them as an array of outcomes
+     * @param currentNode {Node}    current node being traversed
+     * @param target {ReadonlyArray<number>} accumulated targets hit while traversing down tree
+     * @param p {number}    accumulated probability while traversing down tree
+     * @returns {ReadonlyArray<Outcome>}
+     */
+    function getOutcomes(currentNode: Node, target: ReadonlyArray<number>=[], p: number=1): ReadonlyArray<Outcome> {
+        if(currentNode.children.length === 0) {
+            return [{val: target.concat(currentNode.target)
+                .filter(targetVal => targetVal !== -1), p: p * currentNode.p}];
+        }
+        return [].concat( ...currentNode.children.map(child => {
+            return getOutcomes(child, target.concat(currentNode.target), p * currentNode.p);
+        }));
+    }
     /**
      * Returns true if creature's damage taken in this outcome is in compliance with creature.toDie
      * For example if creature.toDie = true and damage taken >= creature.hp the outcome is desired.
@@ -90,7 +59,7 @@ export namespace Ping {
      * @returns {boolean}
      */
     function isDesiredOutcome(creature: CreatureInfo, outcome: Outcome): boolean {
-        const dmg: number = outcome.val.reduce((acc, val) => {
+        const dmg = outcome.val.reduce((acc, val) => {
             if (val === creature.name)
                 return acc + 1;
             else return acc;
@@ -100,25 +69,22 @@ export namespace Ping {
 
     /**
      * Filters outcomes to only outcomes that have desired results
-     * @param creatures {Array<CreatureInfo>} array with creature objects
-     * @param outcomes {Array<Outcome>} array of outcomes
-     * @returns {Array<Outcome>}
+     * @param creatureInputs {ReadonlyArray<CreatureInfo>} array with creature objects
+     * @param outcomes {ReadonlyArray<Outcome>} array of outcomes
+     * @returns {ReadonlyArray<Outcome>}
      */
-    function filterOutcomes(creatures: Array<CreatureInfo>, outcomes: Array<Outcome>): Array<Outcome> {
-        return creatures.reduce((acc, c) =>
-            acc.filter(outcome =>
-                isDesiredOutcome(c, outcome)),
+    function filterOutcomes(creatureInputs: ReadonlyArray<CreatureInfo>, outcomes: ReadonlyArray<Outcome>): ReadonlyArray<Outcome> {
+        return creatureInputs.reduce((acc, c) =>
+                acc.filter(outcome => isDesiredOutcome(c, outcome)),
             outcomes);
     }
-    export function calculate(creatureInput: Array<CreatureInfo>, pings: number) {
+    export function calculate(creatureInput: ReadonlyArray<CreatureInfo>, pings: number): number {
         // Each Creature is represented as an array with length = hp and filled with its name on each entry
-        const creatures: Array<Creature> = creatureInput.map(c => Array(c.hp).fill(c.name)),
-            root: Node = new Node(null, null, 1.0);
-        createOutcomeTree(creatures, pings, root);
-        const leafNodes: Array<Node> = root.leafNodes,
-            outcomes: Array<Outcome> = leafNodes.map((leaf) => leaf.outcome),
-            filteredOutcomes: Array<Outcome> = filterOutcomes(creatureInput, outcomes),
-            summedProbability: number = filteredOutcomes.reduce((acc, outcome) => acc + outcome.p, 0);
+        const creatures: ReadonlyArray<Creature> = creatureInput.map(c => Array(c.hp).fill(c.name)),
+            root = createOutcomeTree(creatures, pings),
+            outcomes = getOutcomes(root),
+            filteredOutcomes = filterOutcomes(creatureInput, outcomes),
+            summedProbability = filteredOutcomes.reduce((acc, outcome) => acc + outcome.p, 0);
         return summedProbability;
     }
 }
