@@ -96,6 +96,7 @@ namespace Calculation {
  * Simulation namespace calculates draw probability by simulating many hands drawn and looking at the number of desired hands
  * found in relation to all hands drawn. It also simulates intelligent mulligans which is its only advantage over
  * Calculation namespace solution.
+ * This namespace uses side effects heavily, having pure functions affected performance in a very bad way I found.
  */
 namespace Simulation {
     /**
@@ -105,8 +106,8 @@ namespace Simulation {
      * @param  {int} j index 2
      */
     function swap(a: Array<any>, i: number, j: number): void {
-        let temp = a[i - 1];
-        a[i - 1] = a[j];
+        let temp = a[i];
+        a[i] = a[j];
         a[j] = temp;
     }
     /**
@@ -115,7 +116,7 @@ namespace Simulation {
      * @return {Array}  returns shuffled array
      */
     function shuffle(a: Array<any>): Array<any> {
-        for (let i = a.length; i > 0; i--) {
+        for (let i = a.length - 1; i >= 0; i--) {
             let j = Math.floor(Math.random() * i);
             swap(a, i, j);
         }
@@ -147,10 +148,17 @@ namespace Simulation {
     }
 
     /**
+     * Used after starting hand is mulliganed to put non target cards back in deck.
+     * @param {Array<number>} deck
+     */
+    function replaceNonTarget(deck: Array<number>) {
+        deck.push(-1);
+        const newIndex = Helpers.getRandomInt(0, deck.length);
+        swap(deck, deck.length - 1, newIndex);
+    }
+    /**
      * Throws away all non target cards in starting hand.
      * @param  {Array} deck           Deck represented as integer array
-     * @param  {Array} targetCards    Array containing desired cards with information
-     * @param  {Boolean} smartMulligan  use smart mulligans in drawSimulation if true
      * @return {Array}                An array where the first object is active hand and second is active deck
      */
     function mulligan(deck: Array<number>): Array<Array<number>> {
@@ -159,57 +167,39 @@ namespace Simulation {
             handAfterMulligan = startingHand.filter((val) => val >= 0),
             mulliganCount = 3 - handAfterMulligan.length;
         /* Put mulliganed cards back in deck. All mulliganed cards are of no interest (-1) */
-        for(let i = 0; i < mulliganCount; i++) {
-            activeDeck.push(-1);
-            swap(activeDeck, activeDeck.length - 1, Helpers.getRandomIntInclusive(0, activeDeck.length));
-        }
+        Helpers.range(0, mulliganCount).forEach((_) => replaceNonTarget(activeDeck));
         return [handAfterMulligan, activeDeck];
     }
     /**
-     * Shuffles deck, performs mulligan, shuffles again, draws remaining cards and checks if all cards are represented
+     * Performs a mulligan, shuffles again, draws remaining cards and checks if all cards are represented
      * at least the needed amount of times.
-     * @param  {Array} deck     Deck represented as integer array
+     * @param  {Array} deck     Deck represented as integer array, should be shuffled beforehand
      * @param  {Array} targetCards     Array containing desired cards with information
      * @param  {Number} drawAmount amount of cards drawn
-     * @return {boolean}          Returns true if drawn cards contain required cards.
+     * @return {boolean}          Returns true if drawn cards contain all required cards.
      */
     function trial(deck: Array<number>, targetCards: Array<CardInfo>, drawAmount: number): boolean {
-        const activeDeck = shuffle(deck),
-            [handAfterMulligan, deckAfterMulligan] = mulligan(activeDeck),
-            remainingDraws = 3 - handAfterMulligan.length,  // 3 is starting hand size before mulligan
-            handAfterDraws = handAfterMulligan.concat(deckAfterMulligan.slice(0, remainingDraws));
+        const [handAfterMulligan, deckAfterMulligan] = mulligan(deck),
+            remainingDraws = drawAmount - handAfterMulligan.length,  // 3 is starting hand size before mulligan
+            handAfterDraws = handAfterMulligan.concat( ...deckAfterMulligan.slice(0, remainingDraws));
         // Return true if every needed card is contained in drawn cards
         return targetCards.every((card) => contains(handAfterDraws, card));
     }
     /**
      * Simulates several separate instances of decks with
      * drawAmount of draws and checks if required cards are contained in hand.
-     * @param  {Array} deck     Deck represented as integer array
      * @param  {Array} targetCards     Array containing desired cards with information
      * @param  {number} drawAmount amount of cards drawn
-     * @param  {number} precision  How many times drawSimulation should be run
+     * @param  {number} tries How many times drawSimulation should be run
      * @return {number}            ratio of successful draws to total draws
      */
-    function simulate(deck: Array<number>, targetCards: Array<CardInfo>, drawAmount: number, precision: number=200000): number {
-        let totalTries: number = precision,
-            success: number = 0;
-        for (let i = 0; i < totalTries; i++) {
-            if(trial(deck, targetCards, drawAmount))
-                success++;
-        }
-        return success / totalTries;
-    }
-    /**
-     * Creates a deck and simulates draws.
-     * @param  {Array} targetCards        Array containing objects with target cards information
-     * @param  {int}  drawAmount          Amount of cards to draw to hand
-     * @return {number}                   Returns the ratio of desired hands to all hands
-     */
-    export function run(targetCards: Array<CardInfo>, drawAmount: number): number {
-        const deck: Array<number> = createDeck(targetCards);
-        return simulate(deck, targetCards, drawAmount);
+    export function simulate(targetCards: Array<CardInfo>, drawAmount: number, tries: number=200000): number {
+        const deck = createDeck(targetCards),
+            desiredOutcomes = Helpers.range(0, tries)
+                .map( _ => trial(shuffle(deck), targetCards, drawAmount))
+                .filter(v => v).length;
+        return desiredOutcomes / tries;
     }
 }
-
-export const runSimulation = Simulation.run;
+export const runSimulation = Simulation.simulate;
 export const runCalculation = Calculation.calculate;

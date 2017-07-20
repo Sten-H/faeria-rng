@@ -1,6 +1,8 @@
 "use strict";
 import * as $ from "jquery";
 import "jrumble";
+import * as R from "ramda";  // All I want is basically to use a lazy seq once :/
+
 
 export namespace UI {
     export function init(): void { // FIXME rename to initUI
@@ -117,7 +119,7 @@ export namespace Helpers {
         });
     }
     export function range(start: number, end: number): ReadonlyArray<number> {
-        return Array(end - start).fill(0).map((val, index) => index + start);
+        return R.range(start, end);
     }
     export function rangeInclusive(start: number, end: number): ReadonlyArray<number> {
         return range(start, end + 1);

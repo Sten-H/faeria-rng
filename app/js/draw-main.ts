@@ -14,7 +14,6 @@ const base: JQuery<HTMLElement> = $("#base");  // base template for cards
 function resultScreenEffects(c: number): void {
     UI.shakeScreen(c);
 }
-
 /**
  * Display error text if user input is incorrect
  */
@@ -48,25 +47,26 @@ function getCardInput(): Array<CardInfo> {
  * @param {Array<CardInfo>}    cardInputs    array of objects containing each card input.
  * @return {Object}             Object containing validity and msg values
  */
-function isInputValid(drawAmount: number, cardInputs: Array<CardInfo>): {val: boolean, msg: JQuery<HTMLElement>} {
+function isInputValid(drawAmount: number, cardInputs: Array<CardInfo>): {isValid: boolean, errorMsg: JQuery<HTMLElement>} {
     const totalAmount: number = cardInputs.reduce((acc, input) => acc + Number(input.total), 0);
     // User supposes a larger deck than is possible
     if (totalAmount > Draw.DECK_SIZE) {
-        return {val: false,
-            msg: $("<span>").append("Target card ", UI.highlightWrap("amounts"), " sum exceeds deck size")};
+        return {isValid: false,
+            errorMsg: $("<span>").append("Target card ", UI.highlightWrap("amounts"), " sum exceeds deck size")};
     }
     const totalNeeded: number = cardInputs.reduce((acc, input) => acc + Number(input.needed), 0);
     // User needs more cards than there are draws, will always fail.
     if (totalNeeded > drawAmount) {
-        return {val: false,
-            msg: $("<span>").append("Fewer ", UI.highlightWrap("draws "), "than ", UI.highlightWrap("needed"), " cards")};
+        return {isValid: false,
+            errorMsg: $("<span>").append("Fewer ", UI.highlightWrap("draws "), "than ", UI.highlightWrap("needed"), " cards")};
     }
     const validNeeded: boolean = cardInputs.every((input) => Number(input.total) >= Number(input.needed));
     // One or more needed values exceeds its amount in deck
     if (!validNeeded) {
-        return {val: false, msg: $("<span>").append(UI.highlightWrap("Needed"), " cannot be larger than card ", UI.highlightWrap("amount"), " in deck")};
+        return {isValid: false,
+            errorMsg: $("<span>").append(UI.highlightWrap("Needed"), " cannot be larger than card ", UI.highlightWrap("amount"), " in deck")};
     }
-    return {val: true, msg: $("")};
+    return {isValid: true, errorMsg: $("")};
 }
 /**
  * Disables calculate button and shows a spinning load icon
@@ -81,7 +81,7 @@ function addLoadingIndicator(): void {
 /**
  * Removes effects shown while loading
  */
-function cleanupLoadIndicator(): void {
+function cleanupLoadingIndicator(): void {
     $("#calculate-btn span").hide();
     $("#calculate-btn").removeClass("disabled");
 }
@@ -90,21 +90,21 @@ function cleanupLoadIndicator(): void {
  */
 function run(): void {
     const smartMulligan: boolean = $("#mulligan-checkbox").is(':checked'),
-        drawAmount = Number($(".draw-amount").val()),
-        cardInfo: Array<CardInfo> = getCardInput(),
-        validity = isInputValid(drawAmount, cardInfo);
-    if (validity.val) {
+        drawAmount = $(".draw-amount").val() as number,
+        cardInfo = getCardInput(),
+        {isValid, errorMsg} = isInputValid(drawAmount, cardInfo);
+    if (isValid) {
         const func = (smartMulligan) ? Draw.runSimulation : Draw.runCalculation,
             promise = Helpers.timeFunction(func, cardInfo, drawAmount);
         promise.then(({t, results}) => {
-            cleanupLoadIndicator();
+            cleanupLoadingIndicator();
             UI.updateResults((t / 1000).toFixed(3), results);
             resultScreenEffects(results);
         });
     }
     else {
-        cleanupLoadIndicator();
-        displayError(validity.msg);
+        cleanupLoadingIndicator();
+        displayError(errorMsg);
     }
     $("#faq-wrapper").collapse('hide');
 }

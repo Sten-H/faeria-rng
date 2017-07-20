@@ -3,7 +3,8 @@ import * as $ from "jquery";
 import * as Tether from "tether";
 /*
 This is depressing but for bootstrap to find these thing when bundled I need to declare them in global namespace
-like this. It worked without when I bundled everything into one bundle not divided in libs and src.
+like this. It worked without when I bundled everything into one bundle not divided in libs and src. What would most
+likely work is bundling jquery and tether in their own bundle that I explicitly src first in html files
  */
 declare global {
     interface Window { jQuery: any, $: any, Tether: any}

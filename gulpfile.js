@@ -8,19 +8,13 @@ const
     source = require('vinyl-source-stream'),
     tsify = require("tsify"),
     gutil = require('gulp-util'),
-    LIBS = ['jquery', 'bootstrap', 'tether', 'jrumble'],
+    LIBS = ['jquery', 'tether', 'bootstrap', 'jrumble', 'ramda'],
     dirs = {
         src: './app/',
         build: './build/'
     };
     dirs.jsOut = dirs.build + 'js/';
     dirs.tsSrc = dirs.src + 'js/';
-
-function swallowError (error) {
-    // If you want details of the error in the console
-    gutil.log(error.toString());
-    this.emit('end');
-}
 
 // Compile nunjucks to html
 gulp.task('nunjucks', function() {
@@ -61,10 +55,10 @@ gulp.task('img', function() {
 gulp.task('watch', function() {
     gulp.watch(dirs.src + 'pages/**/*', ['nunjucks']);
     gulp.watch(dirs.src + 'templates/**/*', ['nunjucks']);
-    gulp.watch(dirs.tsSrc + '*.ts', ['client']);
+    gulp.watch(dirs.tsSrc + '*.ts', ['bundle-src']);
 });
 
-gulp.task('client', function () {
+gulp.task('bundle-src', function () {
     const bundler = browserify({
         debug: true,
         entries: [dirs.tsSrc + 'main.ts'],
@@ -85,7 +79,7 @@ gulp.task('client', function () {
     process.on('uncaughtException', gutil.log);
 });
 
-gulp.task("bundlelib", function() {
+gulp.task("bundle-lib", function() {
     const bundler = browserify({
         debug: false
     });
@@ -98,7 +92,6 @@ gulp.task("bundlelib", function() {
         .pipe(source("common.js"))
         .pipe(gulp.dest(dirs.jsOut));
 });
-
-gulp.task('bundle', ['bundlelib', 'client']);
+gulp.task('bundle', ['bundle-lib', 'bundle-src']);
 gulp.task('build', ['nunjucks', 'bundle', 'css', 'img']);
 gulp.task('default', ['build', 'watch']);
