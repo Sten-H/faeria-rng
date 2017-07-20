@@ -1,6 +1,6 @@
 "use strict";
 import * as $ from "jquery";
-import * as helpers from "./helpers";
+import {UI, Helpers} from "./helpers"
 import {Ping, CreatureInfo} from "./ping-calculation";
 
 // Template for creating creature cards
@@ -33,7 +33,7 @@ function changeLifeStatus(context: JQuery<HTMLElement>): void {
 }
 /**
  * Collects user creature input and creates an array of creature objects
- * @returns {Array}  array with objects containing toDie, hp, name variables
+ * @returns {Array}  array with objects containing toDie, hp, id variables
  */
 function getCreatureInput(): Array<CreatureInfo> {
     const inputs: Array<HTMLElement> = $.makeArray($(".card.creature").not("#base"));
@@ -43,7 +43,7 @@ function getCreatureInput(): Array<CreatureInfo> {
         return {
             toDie: Number($(input).find("select").val()) === 1,
             hp: hp,
-            name: index
+            id: index
         }
     });
 }
@@ -77,10 +77,10 @@ function addLoadingIndicator(): void {
 function run() {
     const creatures = getCreatureInput(),
         pings = getPingInput(),
-        promise = helpers.timeFunction(Ping.calculate, creatures, pings, true);
+        promise = Helpers.timeFunction(Ping.calculate, creatures, pings, true);
     promise.then(({t, results}) => {
-        helpers.updateResults((t / 1000).toFixed(3), results);
-        helpers.shakeScreen(results);
+        UI.updateResults((t / 1000).toFixed(3), results);
+        UI.shakeScreen(results);
         cleanupLoadIndicator();
     });
 }
@@ -90,14 +90,14 @@ export function init(): void {
         changeLifeStatus($(this));
     });
     $("#add-card-btn").click(() => {
-        let newCreature = helpers.addCardListener(base);
+        const newCreature = UI.addCardListener(base);
         newCreature.change(function () {
             changeLifeStatus($(this).find("select"));
         });
     });
     $("#calculate-btn").click(() => {
         addLoadingIndicator();
-        setTimeout(run, 100);
+        setTimeout(run, 100);  // Timeout is used to let DOM update load indicator before heavy run function
     });
-    helpers.init();
+    UI.init();
 }

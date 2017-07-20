@@ -26,6 +26,8 @@
 {# FOOTER #}
 {% block footer %}
 {% endblock %}
-{% block scripts %} {% endblock %}
+{% block scripts %}
+
+{% endblock %}
 </body>
 </html>

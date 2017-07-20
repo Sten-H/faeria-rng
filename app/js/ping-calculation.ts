@@ -1,10 +1,10 @@
 "use strict";
 
-export type CreatureInfo = {toDie: boolean, hp: number, name: number};
+export type CreatureInfo = {toDie: boolean, hp: number, id: number};
 export namespace Ping {
-    // Creature is represented by an array the length of its hp where each entry is its name
+    // Creature is represented by an array the length of its hp where each entry is its id
     type Creature = ReadonlyArray<number>;
-    // Each entry in val array is 'name' of creature target
+    // Each entry in val array is 'id' of targeted creature
     type Outcome =  {val: ReadonlyArray<number>, p: number}
     // Node is a node in probability tree
     type Node = {p: number, target: number, children: ReadonlyArray<Node>}
@@ -15,11 +15,11 @@ export namespace Ping {
         }
         return creatures.map((targetCreature, index) => {
             const probability = 1 / creatures.length,
-                targetName: number = targetCreature[0],
+                targetId: number = targetCreature[0],
                 creaturesAfterPing = creatures
                     .map((creature, i) => (i === index) ? creature.slice(0, creature.length - 1) : creature)
                     .filter(creature => creature.length !== 0);  // Filter out tree root value (-1) from outcomes
-            return {p: probability, target: targetName, children: _createOutcomeTree(creaturesAfterPing, pings - 1)}
+            return {p: probability, target: targetId, children: _createOutcomeTree(creaturesAfterPing, pings - 1)}
         });
     }
     /**
@@ -60,7 +60,7 @@ export namespace Ping {
      */
     function isDesiredOutcome(creature: CreatureInfo, outcome: Outcome): boolean {
         const dmg = outcome.val.reduce((acc, val) => {
-            if (val === creature.name)
+            if (val === creature.id)
                 return acc + 1;
             else return acc;
         }, 0);
@@ -80,7 +80,7 @@ export namespace Ping {
     }
     export function calculate(creatureInput: ReadonlyArray<CreatureInfo>, pings: number): number {
         // Each Creature is represented as an array with length = hp and filled with its name on each entry
-        const creatures: ReadonlyArray<Creature> = creatureInput.map(c => Array(c.hp).fill(c.name)),
+        const creatures: ReadonlyArray<Creature> = creatureInput.map(c => Array(c.hp).fill(c.id)),
             root = createOutcomeTree(creatures, pings),
             outcomes = getOutcomes(root),
             filteredOutcomes = filterOutcomes(creatureInput, outcomes),
@@ -88,3 +88,8 @@ export namespace Ping {
         return summedProbability;
     }
 }
+/**
+ * FIXME I wonder what I was thinking when I made Creature represented by an array (that is copied everytime
+ * it is pinged which is a lot in all outcomes total). If creature was {name, hp} it would probably be much less
+ * impactful on performance
+ */

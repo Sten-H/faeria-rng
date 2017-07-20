@@ -1,20 +1,26 @@
-// Gulp.js configuration
 const
     gulp = require('gulp'),
+    plumber = require('gulp-plumber'),
     nunjucksRender = require('gulp-nunjucks-render'),
     data = require('gulp-data'),
     ts = require("gulp-typescript"),
-    tsProject = ts.createProject("tsconfig.json"),
     browserify = require("browserify"),
     source = require('vinyl-source-stream'),
     tsify = require("tsify"),
-    devBuild = (process.env.NODE_ENV !== 'production');  // development mode?
+    gutil = require('gulp-util'),
+    LIBS = ['jquery', 'bootstrap', 'tether', 'jrumble'],
     dirs = {
         src: './app/',
         build: './build/'
     };
     dirs.jsOut = dirs.build + 'js/';
     dirs.tsSrc = dirs.src + 'js/';
+
+function swallowError (error) {
+    // If you want details of the error in the console
+    gutil.log(error.toString());
+    this.emit('end');
+}
 
 // Compile nunjucks to html
 gulp.task('nunjucks', function() {
@@ -52,27 +58,47 @@ gulp.task('img', function() {
         .pipe(gulp.dest(dirs.build + 'images'));
 });
 
-// watch for changes
 gulp.task('watch', function() {
-    // nunjuck changes
     gulp.watch(dirs.src + 'pages/**/*', ['nunjucks']);
     gulp.watch(dirs.src + 'templates/**/*', ['nunjucks']);
-    // gulp.watch(dirs.tsSrc + '*.ts', ['ts']);
+    gulp.watch(dirs.tsSrc + '*.ts', ['client']);
 });
 
-// Compile typescript from entry point and bundle into one js file
-gulp.task("ts", function () {
-    return browserify({
-        basedir: '.',
+gulp.task('client', function () {
+    const bundler = browserify({
         debug: true,
         entries: [dirs.tsSrc + 'main.ts'],
         cache: {},
-        packageCache: {}
-    })
+        packageCache: {},
+        fullPaths: true
+    });
+
+    LIBS.forEach(function(lib) {
+        bundler.external(require.resolve(lib, { expose: lib }));
+    });
+    bundler
         .plugin(tsify)
         .bundle()
-        .pipe(source('bundle.js'))
+        .pipe(source('client.js'))
+        .pipe(gulp.dest(dirs.jsOut));
+    // Catch errors
+    process.on('uncaughtException', gutil.log);
+});
+
+gulp.task("bundlelib", function() {
+    const bundler = browserify({
+        debug: false
+    });
+
+    LIBS.forEach(function(lib) {
+        bundler.require(lib);
+    });
+
+    bundler.bundle()
+        .pipe(source("common.js"))
         .pipe(gulp.dest(dirs.jsOut));
 });
-gulp.task('build', ['nunjucks', 'ts', 'css', 'libs', 'img']);
+
+gulp.task('bundle', ['bundlelib', 'client']);
+gulp.task('build', ['nunjucks', 'bundle', 'css', 'img']);
 gulp.task('default', ['build', 'watch']);

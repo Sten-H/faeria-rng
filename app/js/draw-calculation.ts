@@ -1,5 +1,5 @@
 "use strict";
-import * as helpers from "./helpers";
+import {Helpers} from "./helpers";
 
 export const DECK_SIZE = 30;
 export type CardInfo = { needed: number, total: number, value: number};
@@ -75,7 +75,7 @@ namespace Calculation {
             return [activeCombo];  // Not entirely sure why I need to wrap this
         }
         const [card, ...cardsLeft] = targetCards;
-        return helpers.rangeInclusive(card.needed, card.total).reduce((results, currentNeeded) => {
+        return Helpers.rangeInclusive(card.needed, card.total).reduce((results, currentNeeded) => {
             return results.concat(targetCombinations(cardsLeft, activeCombo.concat({total: card.total, drawn: currentNeeded})));
         }, []);
     }
@@ -147,58 +147,23 @@ namespace Simulation {
     }
 
     /**
-     * Throws excessive target cards. For example if active hand has two cards of value "0" but only one is needed, one
-     * will be mulliganed. This seems to be an edge case and it doesn't seem to affect accuracy very much at all.
-     * @param activeHand
-     * @param targetCards
-     * @returns {Array} Array representing active hand after mulligans
-     */
-    function mulliganExcessiveCards(activeHand: Array<number>, targetCards: Array<CardInfo>): Array<number> {
-        let cardsFound: Map<number, number> = new Map(),
-            cardsThrowable: Map<number, number> = new Map(),
-            activeHandMulled: Array<number> = activeHand.slice(0);
-        targetCards.forEach((card) => cardsFound.set(card.value, 0));
-        activeHandMulled.forEach((card) => cardsFound.set(card, cardsFound.get(card) + 1 ));
-        targetCards.forEach((card) => cardsThrowable.set(card.value, cardsFound.get(card.value) - card.needed));
-        for(let i = activeHandMulled.length - 1; i >= 0 ; i--) {
-            let currentCard = activeHandMulled[i];
-            for(let j = 0; j < targetCards.length; j++) {
-                let cardValue = targetCards[j].value;
-                if(cardsThrowable.get(cardValue) <= 0 || cardValue !== currentCard) {
-                    break;
-                }
-                else {  // Values match and card is throwable (excessive card)
-                    activeHandMulled.pop();
-                    cardsThrowable.set(cardValue, cardsThrowable.get(cardValue) - 1);
-                }
-            }
-        }
-        return activeHandMulled;
-    }
-    /**
      * Throws away all non target cards in starting hand.
      * @param  {Array} deck           Deck represented as integer array
      * @param  {Array} targetCards    Array containing desired cards with information
      * @param  {Boolean} smartMulligan  use smart mulligans in drawSimulation if true
      * @return {Array}                An array where the first object is active hand and second is active deck
      */
-    function mulligan(deck: Array<number>, targetCards: Array<CardInfo>): Array<Array<number>> {
-        let activeHand: Array<number> = deck.slice(0, 3),
-            activeDeck: Array<number> = deck.slice(3);
-        // Mulligan all non target cards.
-        activeHand = activeHand.filter((val) => val >= 0);
-        // Mulligan excessive target cards.
-        activeHand = mulliganExcessiveCards(activeHand, targetCards);
-        let mulliganCount: number = 3 - activeHand.length;
-        /* Put mulliganed cards back in deck. All mulliganed cards are of no interest (-1) even if they are target cards (excessive)
-         If speed is highly valued, instead of shuffling, the cards can be put back at random indexes instead of shuffling */
+    function mulligan(deck: Array<number>): Array<Array<number>> {
+        const startingHand = deck.slice(0, 3),
+            activeDeck = deck.slice(3),
+            handAfterMulligan = startingHand.filter((val) => val >= 0),
+            mulliganCount = 3 - handAfterMulligan.length;
+        /* Put mulliganed cards back in deck. All mulliganed cards are of no interest (-1) */
         for(let i = 0; i < mulliganCount; i++) {
             activeDeck.push(-1);
-            swap(activeDeck, activeDeck.length -1, helpers.getRandomIntInclusive(0, activeDeck.length));
+            swap(activeDeck, activeDeck.length - 1, Helpers.getRandomIntInclusive(0, activeDeck.length));
         }
-        // Remove drawn cards from deck
-        activeDeck = activeDeck.slice(mulliganCount);
-        return [activeHand, activeDeck];
+        return [handAfterMulligan, activeDeck];
     }
     /**
      * Shuffles deck, performs mulligan, shuffles again, draws remaining cards and checks if all cards are represented
@@ -209,14 +174,12 @@ namespace Simulation {
      * @return {boolean}          Returns true if drawn cards contain required cards.
      */
     function trial(deck: Array<number>, targetCards: Array<CardInfo>, drawAmount: number): boolean {
-        let activeDeck: Array<number> = shuffle(deck),
-            activeHand: Array<number> = [],
-            drawsLeft: number= drawAmount;
-        [activeHand, activeDeck] = mulligan(activeDeck, targetCards);
-        drawsLeft -= activeHand.length;  // Account for starting hand drawn.
-        activeHand = activeHand.concat(activeDeck.slice(0, drawsLeft));
+        const activeDeck = shuffle(deck),
+            [handAfterMulligan, deckAfterMulligan] = mulligan(activeDeck),
+            remainingDraws = 3 - handAfterMulligan.length,  // 3 is starting hand size before mulligan
+            handAfterDraws = handAfterMulligan.concat(deckAfterMulligan.slice(0, remainingDraws));
         // Return true if every needed card is contained in drawn cards
-        return targetCards.every((card) => contains(activeHand, card));
+        return targetCards.every((card) => contains(handAfterDraws, card));
     }
     /**
      * Simulates several separate instances of decks with
