@@ -86,6 +86,8 @@ function run() {
 }
 
 export function init(): void {
+    // Add initial target card input
+    UI.addCard(base);
     $(".creature.god select").change(function () {
         changeLifeStatus($(this));
     });

@@ -10,11 +10,8 @@
     {# CARD AREA #}
     <div class="col-12">
         <div class="card-columns" id="card-container">
-            {# Link card #}
-            {{ cards.createLinkCard("Pings", "ping.html") }}
-            <!-- Draw card -->
+            {{ cards.createBackCard() }}
             {{ cards.createDrawsCard() }}
-            <!-- Options card -->
             {{ cards.createOptionsCard() }}
         </div>
     </div>

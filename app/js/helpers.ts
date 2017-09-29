@@ -1,7 +1,7 @@
 "use strict";
 import * as $ from "jquery";
 import "jrumble";
-import * as R from "ramda";  // All I want is basically to use a lazy seq once :/
+import * as R from "ramda";
 
 
 export namespace UI {

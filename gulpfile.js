@@ -1,13 +1,12 @@
 const
     gulp = require('gulp'),
-    plumber = require('gulp-plumber'),
-    nunjucksRender = require('gulp-nunjucks-render'),
     data = require('gulp-data'),
+    gutil = require('gulp-util'),
     ts = require("gulp-typescript"),
+    nunjucksRender = require('gulp-nunjucks-render'),
     browserify = require("browserify"),
     source = require('vinyl-source-stream'),
     tsify = require("tsify"),
-    gutil = require('gulp-util'),
     LIBS = ['jquery', 'tether', 'bootstrap', 'jrumble', 'ramda'],
     dirs = {
         src: './app/',
@@ -37,14 +36,13 @@ gulp.task('libs', function(){
 });
 
 gulp.task('css', function() {
-    gulp.src(['node_modules/bootstrap/**/*.css'])
+    gulp.src(['node_modules/bootstrap/**/bootstrap.css'])
         .pipe(gulp.dest(dirs.build + 'css/bootstrap/'));
     gulp.src(['node_modules/tether/**/*.css'])
         .pipe(gulp.dest(dirs.build + 'css/tether/'));
     return gulp.src([dirs.src + 'css/**/*'])
         .pipe(gulp.dest(dirs.build + 'css'));
 });
-
 // Copy images
 gulp.task('img', function() {
     "use strict";

@@ -1,0 +1,36 @@
+{% extends "main-layout.nunjucks" %}
+{% import 'macros/cards.nunjucks' as cards %}
+{% block title %}
+    {% include 'partials/title.nunjucks' %}
+{% endblock %}
+{% block content %}
+    <div class="card-deck">
+        <div class="card card-success">
+            <div class="card-block">
+                <h4 class="card-title text-center">
+                    Draw Probability
+                </h4>
+                <hr>
+                <p>
+                    This is for you who have drawn 20 cards without drawing your infamous two card combo. "What are the odds?" you mumble to yourself. Do you really want to know?
+                </p>
+                <a href="draw.html" class="btn btn-danger">Go get angry</a>
+            </div>
+        </div>
+        <div class="card card-success">
+            <div class="card-block">
+                <h4 class="card-title text-center">
+                    Ping Probability
+                </h4>
+                <hr>
+                <p>
+                    You played hellfire, didn't you? Nine separate random damage instances and every single one hit the same target with three available targets on the board. Is it even possible? Ask no more!
+                </p>
+                <a href="ping.html" class="btn btn-danger">Go get angrier</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block footer %}
+    {% include "partials/footer.nunjucks" %}
+{% endblock %}

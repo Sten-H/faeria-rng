@@ -43,8 +43,8 @@
     "vinyl-source-stream": "^1.1.0"
   },
   "dependencies": {
-    "@types/jquery": "^3.2.8",
     "@types/bootstrap": "^3.3.35",
+    "@types/jquery": "^3.2.8",
     "@types/ramda": "^0.24.4",
     "@types/tether": "^1.4.2",
     "bootstrap": "^4.0.0-alpha.6",

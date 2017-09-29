@@ -50,7 +50,7 @@
         {% elseif type == "god" %}  creature god card-success
         {% elseif type == "to-draw" %} draw card-info
         {% elseif type == "options" %} card-success
-        {% elseif type == "link" %} card-warning
+        {% elseif type == "link" %} link card-warning
         {% else %} card-danger
         {% endif %}
         text-center"
@@ -97,14 +97,9 @@
                    href="{{ linkTo | safe }}">{{ text }}<span class="glyphicon glyphicon-menu-right"></span>
                 </a>
             </div>
-            <div class="col-6 col-sm-12">
-                <a class="lead"
-                   href="#">About<span class="glyphicon glyphicon-menu-right"></span>
-                </a>
-            </div>
         </div>
     {% endset %}
-    {{ create(title, "link") }}
+    {{ create(title, "link", id) }}
 {% endmacro %}
 
 {% macro createOptionsCard() %}
@@ -123,3 +118,12 @@
         Calculate <span class="glyphicon glyphicon-spin glyphicon-repeat"></span>
     </button>
 {% endmacro %}
+{% macro createBackCard() %}
+    <div class="card card-warning link">
+        <div class="card-block pb-1 pt-2">
+            <div class="card-title text-center">
+                <a class="lead" href="index.html"><span class="glyphicon glyphicon-menu-left"></span> Go Back</a>
+            </div>
+        </div>
+    </div>
+{%  endmacro  %}
